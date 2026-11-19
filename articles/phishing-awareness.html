@@ -109,6 +109,7 @@ If a message asks you to transfer money, share a verification code or change acc
 سؤال شائع: هل الرسالة التي تستخدم شعار شركة معروفة آمنة؟
 لا. يمكن نسخ الشعارات والتصميمات بسهولة؛ تحقق من عنوان الموقع وطريقة التواصل قبل تقديم أي بيانات.</div>
 <div class="references" style="border-top:1px solid #e3eaf0;margin-top:24px;padding-top:16px;font-size:14px"><strong data-ar="مصادر ومراجع للتوسع" data-en="Further reading">مصادر ومراجع للتوسع</strong><p><a href="https://www.cisa.gov/sites/default/files/2024-09/Secure-Our-World-4-Easy-Ways-Stay-Safe-Online-Tip-Sheet.pdf" target="_blank" rel="noopener noreferrer" style="color:#17638b" data-ar="إرشادات الحماية من التصيد – CISA" data-en="Online Safety and Phishing Tip Sheet – CISA">إرشادات الحماية من التصيد – CISA</a></p></div>\n<div class="note" data-ar="هذا المحتوى تعليمي عام. تحقق من المصادر الرسمية في المسائل المتغيرة أو الحساسة، ولا تعتبره بديلاً عن استشارة المختصين." data-en="This is general educational content. Check official sources for changing or sensitive matters; it is not a substitute for professional advice.">هذا المحتوى تعليمي عام. تحقق من المصادر الرسمية في المسائل المتغيرة أو الحساسة، ولا تعتبره بديلاً عن استشارة المختصين.</div>
+<section class="knowledge-quiz" id="phishingQuiz"><div class="tool-kicker">SMART INFO • QUICK QUIZ</div><h2 id="phishingQuizTitle">اختبر قدرتك على كشف التصيد</h2><p id="phishingQuizIntro">تعرف على علامات الرسائل الاحتيالية.</p><div id="phishingQuizQuestions"></div><button class="tool-button" type="button" id="phishingQuizSubmit">تحقق من الإجابات</button><div class="tool-result" id="phishingQuizResult" aria-live="polite">اختر إجابة لكل سؤال.</div></section>
 <nav class="article-navigation" aria-label="Article navigation">
 <a class="article-nav-link prev" href="./monthly-budget.html"><span class="nav-direction" data-ar="المقال السابق" data-en="Previous article">المقال السابق</span><strong>←</strong></a>
 <a class="article-nav-link next" href="./road-trip-checklist.html"><span class="nav-direction" data-ar="المقال التالي" data-en="Next article">المقال التالي</span><strong>→</strong></a>
@@ -144,7 +145,7 @@ function applyLanguage(){
  document.querySelectorAll("[data-ar]").forEach(el=>{if(el!==articleBody)el.textContent=el.dataset[language]});
  document.getElementById("lang").textContent=language==="ar"?"English":"العربية";
  renderArticle(language);
- updateReadingMeta();
+ updateReadingMeta();renderPhishingQuiz();
 }
 renderArticle(language);
 const readingMeta=document.createElement("div");readingMeta.className="reading-meta";toc.before(readingMeta);
@@ -178,5 +179,18 @@ relatedSection.append(relatedTitle,relatedGrid);
 const articleNav=document.querySelector(".article-navigation");
 if(articleNav)articleNav.before(relatedSection);else document.querySelector(".article").appendChild(relatedSection);
 document.getElementById("lang").onclick=()=>{language=language==="ar"?"en":"ar";applyLanguage()};
+
+const phishingQuizData={ar:[{"q":"وصلتك رسالة تهدد بإغلاق حسابك خلال دقائق. ما التصرف الأفضل؟","o":["الضغط على الرابط فوراً","فتح التطبيق الرسمي أو كتابة عنوان الموقع بنفسك","إرسال رمز التحقق للمرسل"],"a":1,"e":"تحقق عبر التطبيق أو العنوان الرسمي بدلاً من رابط الرسالة."},{"q":"أي علامة قد تشير إلى رسالة تصيد؟","o":["طلب عاجل لكلمة المرور أو رمز التحقق","إشعار متوقع داخل التطبيق الرسمي","رسالة تعرف مصدرها وتنتظرها"],"a":0,"e":"الضغط والاستعجال وطلب بيانات الدخول من علامات التحذير."},{"q":"إذا ادعت الرسالة أنها من بنكك، كيف تتحقق؟","o":["الاتصال بالرقم الموجود في الرسالة","الرد على الرسالة","استخدام رقم البنك المنشور في موقعه الرسمي"],"a":2,"e":"استخدم وسيلة اتصال مستقلة وموثوقة منشورة رسمياً."}],en:[{"q":"A message threatens to close your account in minutes. What should you do?","o":["Click its link immediately","Open the official app or type the website address yourself","Send the sender your verification code"],"a":1,"e":"Verify through the official app or website rather than the message link."},{"q":"Which may indicate a phishing message?","o":["An urgent request for your password or verification code","An expected notice inside the official app","A message you recognize and were expecting"],"a":0,"e":"Urgency and requests for login details are warning signs."},{"q":"A message claims to be from your bank. How should you verify it?","o":["Call the number in the message","Reply to the message","Use the bank number published on its official website"],"a":2,"e":"Use an independent, trusted contact method published by the bank."}]};
+function renderPhishingQuiz(){
+ const ar=language==="ar",root=document.getElementById("phishingQuizQuestions");root.replaceChildren();
+ document.getElementById("phishingQuizTitle").textContent=ar?"اختبر قدرتك على كشف التصيد":"Test your phishing awareness";
+ document.getElementById("phishingQuizIntro").textContent=ar?"تعرف على علامات الرسائل الاحتيالية.":"Learn to spot common scam message warning signs.";
+ document.getElementById("phishingQuizSubmit").textContent=ar?"تحقق من الإجابات":"Check answers";
+ document.getElementById("phishingQuizResult").textContent=ar?"اختر إجابة لكل سؤال.":"Choose one answer for each question.";
+ phishingQuizData[language].forEach((q,i)=>{const box=document.createElement("div");box.className="quiz-question";const title=document.createElement("strong");title.textContent=(i+1)+". "+q.q;box.append(title);const opts=document.createElement("div");opts.className="quiz-options";q.o.forEach((o,j)=>{const label=document.createElement("label");label.className="quiz-option";const input=document.createElement("input");input.type="radio";input.name="phishing-q"+i;input.value=j;const span=document.createElement("span");span.textContent=o;label.append(input,span);opts.append(label)});box.append(opts);root.append(box)});
+}
+document.getElementById("phishingQuizSubmit").addEventListener("click",()=>{let score=0,answered=0;phishingQuizData[language].forEach((q,i)=>{const selected=document.querySelector('input[name="phishing-q'+i+'"]:checked'),box=document.querySelectorAll("#phishingQuizQuestions .quiz-question")[i];box.querySelectorAll(".quiz-option").forEach((label,j)=>{label.classList.toggle("correct",j===q.a);label.classList.toggle("incorrect",!!selected&&j===Number(selected.value)&&j!==q.a)});let fb=box.querySelector(".quiz-feedback");if(!fb){fb=document.createElement("div");fb.className="quiz-feedback";box.append(fb)}fb.textContent=q.e;if(selected){answered++;if(Number(selected.value)===q.a)score++}});document.getElementById("phishingQuizResult").textContent=language==="ar"?"نتيجتك: "+score+" من "+3+" — أجبت عن "+answered+" أسئلة.":"Your score: "+score+" out of "+3+" — answered "+answered+" questions.";});
+renderPhishingQuiz();
+
 </script>
 </body></html>
