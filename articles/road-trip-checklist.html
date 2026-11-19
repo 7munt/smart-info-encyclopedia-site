@@ -106,6 +106,7 @@ Before departure, know the roadside-assistance numbers and the locations of serv
 تنبيه
 هذه قائمة عامة وليست بديلاً عن جدول الصيانة الخاص بسيارتك أو فحص فني عند وجود عطل.</div>
 <div class="references" style="border-top:1px solid #e3eaf0;margin-top:24px;padding-top:16px;font-size:14px"><strong data-ar="مصادر ومراجع للتوسع" data-en="Further reading">مصادر ومراجع للتوسع</strong><p><a href="https://www.nhtsa.gov/summer-driving-tips" target="_blank" rel="noopener noreferrer" style="color:#17638b" data-ar="نصائح القيادة الآمنة وفحص السيارة – NHTSA" data-en="Safe Driving and Vehicle Checks – NHTSA">نصائح القيادة الآمنة وفحص السيارة – NHTSA</a></p></div>\n<div class="note" data-ar="هذا المحتوى تعليمي عام. تحقق من المصادر الرسمية في المسائل المتغيرة أو الحساسة، ولا تعتبره بديلاً عن استشارة المختصين." data-en="This is general educational content. Check official sources for changing or sensitive matters; it is not a substitute for professional advice.">هذا المحتوى تعليمي عام. تحقق من المصادر الرسمية في المسائل المتغيرة أو الحساسة، ولا تعتبره بديلاً عن استشارة المختصين.</div>
+<section class="trip-checklist" id="vehicleChecklist"><div class="tool-kicker">SMART INFO • VEHICLE CHECK</div><h2 id="vehicleTitle">قائمة فحص السيارة قبل السفر</h2><p id="vehicleIntro">راجع العناصر وضع علامة بعد التأكد منها.</p><div id="vehicleItems"></div><div class="task-progress"><span id="vehicleProgress"></span></div><div id="vehicleCount" aria-live="polite">0 / 12 مكتملة</div></section>
 <nav class="article-navigation" aria-label="Article navigation">
 <a class="article-nav-link prev" href="./phishing-awareness.html"><span class="nav-direction" data-ar="المقال السابق" data-en="Previous article">المقال السابق</span><strong>←</strong></a>
 <a class="article-nav-link next" href="../index.html"><span class="nav-direction" data-ar="المقال التالي" data-en="Next article">المقال التالي</span><strong data-ar="العودة للموسوعة" data-en="Back to encyclopedia">العودة للموسوعة</strong></a>
@@ -141,7 +142,7 @@ function applyLanguage(){
  document.querySelectorAll("[data-ar]").forEach(el=>{if(el!==articleBody)el.textContent=el.dataset[language]});
  document.getElementById("lang").textContent=language==="ar"?"English":"العربية";
  renderArticle(language);
- updateReadingMeta();
+ updateReadingMeta();renderVehicleChecklist();
 }
 renderArticle(language);
 const readingMeta=document.createElement("div");readingMeta.className="reading-meta";toc.before(readingMeta);
@@ -175,5 +176,19 @@ relatedSection.append(relatedTitle,relatedGrid);
 const articleNav=document.querySelector(".article-navigation");
 if(articleNav)articleNav.before(relatedSection);else document.querySelector(".article").appendChild(relatedSection);
 document.getElementById("lang").onclick=()=>{language=language==="ar"?"en":"ar";applyLanguage()};
+
+let vehicleChecked=new Set();
+function renderVehicleChecklist(){
+ const ar=language==="ar",root=document.getElementById("vehicleItems");root.replaceChildren();
+ document.getElementById("vehicleTitle").textContent=ar?"قائمة فحص السيارة قبل السفر":"Pre-trip vehicle checklist";
+ document.getElementById("vehicleIntro").textContent=ar?"راجع العناصر وضع علامة بعد التأكد منها.":"Review each item and check it when confirmed.";
+ let index=0,total=0;
+ vehicleData[language].forEach(group=>{const section=document.createElement("section");section.className="trip-check-group";const h=document.createElement("h3");h.textContent=group[0];section.append(h);group[1].forEach(item=>{const id=index++,label=document.createElement("label");label.className="trip-check-row";const cb=document.createElement("input");cb.type="checkbox";cb.checked=vehicleChecked.has(id);cb.addEventListener("change",()=>{cb.checked?vehicleChecked.add(id):vehicleChecked.delete(id);updateVehicleCount()});const span=document.createElement("span");span.textContent=item;label.append(cb,span);section.append(label);total++});root.append(section)});
+ updateVehicleCount();
+}
+function updateVehicleCount(){const total=vehicleData[language].reduce((n,g)=>n+g[1].length,0),done=vehicleChecked.size;document.getElementById("vehicleCount").textContent=language==="ar"?done+" / "+total+" مكتملة":done+" / "+total+" completed";document.getElementById("vehicleProgress").style.width=(done/total*100)+"%";}
+const vehicleData={"ar":[["الإطارات والعجلات",["فحص ضغط الإطارات وهي باردة حسب ملصق السيارة","فحص النقشة والجوانب والإطار الاحتياطي","التأكد من وجود عدة تغيير الإطار أو وسيلة المساعدة"]],["السوائل والمحرك",["فحص زيت المحرك وسائل التبريد وفق الدليل","فحص مستوى سائل المساحات","ملاحظة أي تسريب ظاهر أسفل السيارة"]],["الفرامل والأنوار",["التأكد من سلامة الفرامل وعدم وجود أصوات أو اهتزاز","اختبار الأنوار الأمامية والخلفية وإشارات الانعطاف","التأكد من عمل أضواء الفرامل والمساحات"]],["التجهيزات والوثائق",["فحص تثبيت أقطاب البطارية","حمل الوثائق وأرقام المساعدة والطوارئ","تجهيز شاحن هاتف وماء ومستلزمات طوارئ مناسبة"]]],"en":[["Tires and wheels",["Check cold tire pressure using the vehicle label","Inspect tread, sidewalls and spare tire","Ensure a tire-changing kit or roadside assistance is available"]],["Fluids and engine",["Check engine oil and coolant according to the manual","Check windshield washer fluid","Look for visible leaks beneath the vehicle"]],["Brakes and lights",["Check brakes for unusual noises or vibration","Test headlights, tail lights and turn signals","Check brake lights and wipers"]],["Equipment and documents",["Check battery terminal security","Carry documents and emergency contact details","Prepare a phone charger, water and suitable emergency supplies"]]]};
+renderVehicleChecklist();
+
 </script>
 </body></html>
