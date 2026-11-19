@@ -156,3 +156,9 @@ footer:not(.footer) p{display:flex;flex-wrap:wrap;gap:8px 15px}
  .article-section,.article-toc,.references,.note{max-width:none}
  .article .footer{gap:7px 13px}
 }
+
+.footer-inner{width:min(940px,100%);margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.footer-inner strong{font-size:17px;color:#f3f6ff}
+.footer-inner nav{display:flex;align-items:center;gap:9px 18px;flex-wrap:wrap}
+.footer-inner nav a{font-size:12px;padding:5px 0}
+@media(max-width:640px){.footer-inner{display:block}.footer-inner nav{margin-top:16px;gap:8px 14px}.footer-inner nav a{font-size:11px}}
