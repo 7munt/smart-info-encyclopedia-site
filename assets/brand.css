@@ -110,3 +110,10 @@ a:focus-visible,button:focus-visible{outline:3px solid #83a6ff!important;outline
  footer,.footer{width:calc(100% - 28px);margin:22px auto 35px!important}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}}
+
+/* Compact contact-page masthead */
+.wrap>.top{position:relative!important;top:auto!important;z-index:1!important;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 16px!important;margin:0 0 22px!important;border-radius:18px;background:linear-gradient(110deg,#071329,#10284f 70%,#1c3267)!important;box-shadow:0 12px 30px #07132920!important}
+.wrap>.top .brand{color:#f4f7ff!important;font-weight:850}
+.wrap>.top .back{color:#dbe7ff!important;font-size:13px}
+.wrap>.top .lang{margin-inline-start:10px}
+@media(max-width:520px){.wrap>.top{align-items:flex-start;flex-wrap:wrap}.wrap>.top>div{display:flex;align-items:center;gap:8px}.wrap>.top .lang{margin:0}}
