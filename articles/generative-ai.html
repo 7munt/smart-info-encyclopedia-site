@@ -107,7 +107,7 @@ Instead of asking a broad question such as explain artificial intelligence, spec
 هل يجب ذكر استخدامه؟ اتبع قواعد الجهة أو المؤسسة التي تعمل معها، وكن واضحاً عندما يؤثر استخدامه في أصالة العمل أو موثوقيته.</div>
 <div class="references" style="border-top:1px solid #e3eaf0;margin-top:24px;padding-top:16px;font-size:14px"><strong data-ar="مصادر ومراجع للتوسع" data-en="Further reading">مصادر ومراجع للتوسع</strong><p><a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener noreferrer" style="color:#17638b" data-ar="إطار إدارة مخاطر الذكاء الاصطناعي – NIST" data-en="AI Risk Management Framework – NIST">إطار إدارة مخاطر الذكاء الاصطناعي – NIST</a></p></div>\n<div class="note" data-ar="هذا المحتوى تعليمي عام. تحقق من المصادر الرسمية في المسائل المتغيرة أو الحساسة، ولا تعتبره بديلاً عن استشارة المختصين." data-en="This is general educational content. Check official sources for changing or sensitive matters; it is not a substitute for professional advice.">هذا المحتوى تعليمي عام. تحقق من المصادر الرسمية في المسائل المتغيرة أو الحساسة، ولا تعتبره بديلاً عن استشارة المختصين.</div>
 <nav class="article-navigation" aria-label="Article navigation">
-<a class="article-nav-link prev" href="../index.html"><span class="nav-direction" data-ar="المقال السابق" data-en="Previous article">المقال السابق</span><strong>العودة للموسوعة</strong></a>
+<a class="article-nav-link prev" href="../index.html"><span class="nav-direction" data-ar="المقال السابق" data-en="Previous article">المقال السابق</span><strong data-ar="العودة للموسوعة" data-en="Back to encyclopedia">العودة للموسوعة</strong></a>
 <a class="article-nav-link next" href="./car-tire-maintenance.html"><span class="nav-direction" data-ar="المقال التالي" data-en="Next article">المقال التالي</span><strong>→</strong></a>
 </nav>
 </article></main>
@@ -141,13 +141,16 @@ function applyLanguage(){
  document.querySelectorAll("[data-ar]").forEach(el=>{if(el!==articleBody)el.textContent=el.dataset[language]});
  document.getElementById("lang").textContent=language==="ar"?"English":"العربية";
  renderArticle(language);
+ updateReadingMeta();
 }
 renderArticle(language);
-const readingText=articleAr+" "+articleEn;
-const readingMinutes=Math.max(1,Math.ceil(readingText.trim().split(/\s+/).length/220));
-const readingMeta=document.createElement("div");readingMeta.className="reading-meta";
-readingMeta.innerHTML='<span data-ar="وقت القراءة التقريبي" data-en="Estimated reading time">وقت القراءة التقريبي</span><strong>'+readingMinutes+' <span data-ar="دقائق" data-en="min">دقائق</span></strong>';
-toc.before(readingMeta);
+const readingMeta=document.createElement("div");readingMeta.className="reading-meta";toc.before(readingMeta);
+function updateReadingMeta(){
+ const words=(language==="ar"?articleAr:articleEn).trim().split(/\s+/).length;
+ const minutes=Math.max(1,Math.ceil(words/220));
+ readingMeta.innerHTML='<span>'+(language==="ar"?"وقت القراءة التقريبي":"Estimated reading time")+'</span><strong>'+minutes+' '+(language==="ar"?"دقائق":"min")+'</strong>';
+}
+updateReadingMeta();
 function updateReadingProgress(){
  const scrollable=document.documentElement.scrollHeight-window.innerHeight;
  const progress=scrollable>0?Math.min(100,Math.max(0,(window.scrollY/scrollable)*100)):0;
