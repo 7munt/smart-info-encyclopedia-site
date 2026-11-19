@@ -109,6 +109,7 @@ Keep secure digital copies of bookings and documents, and have an alternative wa
 سؤال شائع: هل أحجز كل الأنشطة مسبقاً؟
 احجز ما ينفد سريعاً أو يرتبط بموعد محدد، واترك الأنشطة المرنة لتقررها حسب الظروف.</div>
 <div class="references" style="border-top:1px solid #e3eaf0;margin-top:24px;padding-top:16px;font-size:14px"><strong data-ar="مصادر ومراجع للتوسع" data-en="Further reading">مصادر ومراجع للتوسع</strong><p><a href="https://travel.state.gov/en/international-travel/planning/checklist.html" target="_blank" rel="noopener noreferrer" style="color:#17638b" data-ar="قائمة التخطيط للسفر الدولي – وزارة الخارجية الأمريكية" data-en="International Travel Checklist – U.S. State Department">قائمة التخطيط للسفر الدولي – وزارة الخارجية الأمريكية</a></p></div>\n<div class="note" data-ar="هذا المحتوى تعليمي عام. تحقق من المصادر الرسمية في المسائل المتغيرة أو الحساسة، ولا تعتبره بديلاً عن استشارة المختصين." data-en="This is general educational content. Check official sources for changing or sensitive matters; it is not a substitute for professional advice.">هذا المحتوى تعليمي عام. تحقق من المصادر الرسمية في المسائل المتغيرة أو الحساسة، ولا تعتبره بديلاً عن استشارة المختصين.</div>
+<section class="trip-checklist" id="tripChecklist"><div class="tool-kicker">SMART INFO • TRIP PLANNER</div><h2 id="tripTitle">قائمة تجهيز الرحلة</h2><p id="tripIntro">ضع علامة أمام كل خطوة تنجزها، وتابع نسبة استعدادك.</p><div id="tripItems"></div><div class="task-progress"><span id="tripProgressBar"></span></div><div id="tripCount" aria-live="polite">0 / 12 مكتملة</div></section>
 <nav class="article-navigation" aria-label="Article navigation">
 <a class="article-nav-link prev" href="./moon-phases.html"><span class="nav-direction" data-ar="المقال السابق" data-en="Previous article">المقال السابق</span><strong>←</strong></a>
 <a class="article-nav-link next" href="./daily-task-planning.html"><span class="nav-direction" data-ar="المقال التالي" data-en="Next article">المقال التالي</span><strong>→</strong></a>
@@ -144,7 +145,7 @@ function applyLanguage(){
  document.querySelectorAll("[data-ar]").forEach(el=>{if(el!==articleBody)el.textContent=el.dataset[language]});
  document.getElementById("lang").textContent=language==="ar"?"English":"العربية";
  renderArticle(language);
- updateReadingMeta();
+ updateReadingMeta();renderTripChecklist();
 }
 renderArticle(language);
 const readingMeta=document.createElement("div");readingMeta.className="reading-meta";toc.before(readingMeta);
@@ -178,5 +179,21 @@ relatedSection.append(relatedTitle,relatedGrid);
 const articleNav=document.querySelector(".article-navigation");
 if(articleNav)articleNav.before(relatedSection);else document.querySelector(".article").appendChild(relatedSection);
 document.getElementById("lang").onclick=()=>{language=language==="ar"?"en":"ar";applyLanguage()};
+
+const tripItemsData={
+ar:[["الوثائق والحجوزات",["التأكد من صلاحية وثائق السفر والتأشيرات","تأكيد حجوزات الطيران والإقامة","حفظ نسخ آمنة من الوثائق وأرقام الطوارئ"]],["الميزانية والتواصل",["تحديد ميزانية ومبلغ احتياطي","تجهيز وسيلة اتصال وبيانات الإنترنت","إبلاغ شخص موثوق بخطة الرحلة"]],["التنقل والاستعداد",["تحديد وسيلة الانتقال من وإلى المطار","مراجعة الطقس والاحتياجات الخاصة بالوجهة","تجهيز الأدوية الشخصية الضرورية","التحقق من سياسة الأمتعة والإلغاء"]]],
+en:[["Documents and bookings",["Check travel document validity and visa requirements","Confirm flight and accommodation bookings","Store secure copies of documents and emergency contacts"]],["Budget and communication",["Set a budget and contingency amount","Prepare a communication and internet option","Share your itinerary with someone you trust"]],["Transport and preparation",["Plan transport to and from the airport","Check weather and destination-specific needs","Pack necessary personal medication","Review baggage and cancellation policies"]]]
+};
+let tripChecked=new Set();
+function renderTripChecklist(){
+ const ar=language==="ar",root=document.getElementById("tripItems");root.replaceChildren();let index=0,total=0;
+ document.getElementById("tripTitle").textContent=ar?"قائمة تجهيز الرحلة":"Trip preparation checklist";
+ document.getElementById("tripIntro").textContent=ar?"ضع علامة أمام كل خطوة تنجزها، وتابع نسبة استعدادك.":"Check each item as you complete it and track your preparation.";
+ tripItemsData[language].forEach(group=>{const section=document.createElement("section");section.className="trip-check-group";const heading=document.createElement("h3");heading.textContent=group[0];section.append(heading);group[1].forEach(label=>{const id=index++,row=document.createElement("label");row.className="trip-check-row";const cb=document.createElement("input");cb.type="checkbox";cb.checked=tripChecked.has(id);cb.addEventListener("change",()=>{cb.checked?tripChecked.add(id):tripChecked.delete(id);updateTripCount()});const span=document.createElement("span");span.textContent=label;row.append(cb,span);section.append(row);total++});root.append(section)});
+ updateTripCount();
+}
+function updateTripCount(){const total=tripItemsData[language].reduce((n,g)=>n+g[1].length,0),done=tripChecked.size;document.getElementById("tripCount").textContent=language==="ar"?done+" / "+total+" مكتملة":done+" / "+total+" completed";document.getElementById("tripProgressBar").style.width=(done/total*100)+"%";}
+renderTripChecklist();
+
 </script>
 </body></html>
