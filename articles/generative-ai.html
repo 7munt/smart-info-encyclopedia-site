@@ -106,6 +106,7 @@ Instead of asking a broad question such as explain artificial intelligence, spec
 هل يمكنه أن يحل محل الخبير؟ يمكنه المساعدة في التحضير والفهم، لكنه لا يحل محل المختص في القرارات عالية الأثر.
 هل يجب ذكر استخدامه؟ اتبع قواعد الجهة أو المؤسسة التي تعمل معها، وكن واضحاً عندما يؤثر استخدامه في أصالة العمل أو موثوقيته.</div>
 <div class="references" style="border-top:1px solid #e3eaf0;margin-top:24px;padding-top:16px;font-size:14px"><strong data-ar="مصادر ومراجع للتوسع" data-en="Further reading">مصادر ومراجع للتوسع</strong><p><a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener noreferrer" style="color:#17638b" data-ar="إطار إدارة مخاطر الذكاء الاصطناعي – NIST" data-en="AI Risk Management Framework – NIST">إطار إدارة مخاطر الذكاء الاصطناعي – NIST</a></p></div>\n<div class="note" data-ar="هذا المحتوى تعليمي عام. تحقق من المصادر الرسمية في المسائل المتغيرة أو الحساسة، ولا تعتبره بديلاً عن استشارة المختصين." data-en="This is general educational content. Check official sources for changing or sensitive matters; it is not a substitute for professional advice.">هذا المحتوى تعليمي عام. تحقق من المصادر الرسمية في المسائل المتغيرة أو الحساسة، ولا تعتبره بديلاً عن استشارة المختصين.</div>
+<section class="knowledge-quiz" id="aiQuiz"><div class="tool-kicker">SMART INFO • QUICK QUIZ</div><h2 id="aiQuizTitle">اختبر معلوماتك</h2><p id="aiQuizIntro">ثلاثة أسئلة سريعة حول الذكاء الاصطناعي التوليدي.</p><div id="aiQuizQuestions"></div><button class="tool-button" type="button" id="aiQuizSubmit">تحقق من الإجابات</button><div class="tool-result" id="aiQuizResult" aria-live="polite">اختر إجابة لكل سؤال.</div></section>
 <nav class="article-navigation" aria-label="Article navigation">
 <a class="article-nav-link prev" href="../index.html"><span class="nav-direction" data-ar="المقال السابق" data-en="Previous article">المقال السابق</span><strong data-ar="العودة للموسوعة" data-en="Back to encyclopedia">العودة للموسوعة</strong></a>
 <a class="article-nav-link next" href="./car-tire-maintenance.html"><span class="nav-direction" data-ar="المقال التالي" data-en="Next article">المقال التالي</span><strong>→</strong></a>
@@ -141,7 +142,7 @@ function applyLanguage(){
  document.querySelectorAll("[data-ar]").forEach(el=>{if(el!==articleBody)el.textContent=el.dataset[language]});
  document.getElementById("lang").textContent=language==="ar"?"English":"العربية";
  renderArticle(language);
- updateReadingMeta();
+ updateReadingMeta();renderAiQuiz(language);
 }
 renderArticle(language);
 const readingMeta=document.createElement("div");readingMeta.className="reading-meta";toc.before(readingMeta);
@@ -175,5 +176,28 @@ relatedSection.append(relatedTitle,relatedGrid);
 const articleNav=document.querySelector(".article-navigation");
 if(articleNav)articleNav.before(relatedSection);else document.querySelector(".article").appendChild(relatedSection);
 document.getElementById("lang").onclick=()=>{language=language==="ar"?"en":"ar";applyLanguage()};
+
+const aiQuizData={
+ar:[
+{q:"ما الذي يفعله الذكاء الاصطناعي التوليدي؟",o:["يُنشئ محتوى جديداً اعتماداً على أنماط تعلمها","يضمن صحة كل معلومة","يعمل دون بيانات تدريب"],a:0,e:"ينتج محتوى مثل النصوص والصور اعتماداً على الأنماط التي تعلمها."},
+{q:"هل تعني الإجابة المقنعة أنها صحيحة دائماً؟",o:["نعم، دائماً","لا، قد تحتوي على أخطاء","فقط إذا كانت طويلة"],a:1,e:"قد تبدو المخرجات مقنعة رغم احتوائها على معلومات خاطئة."},
+{q:"ما أفضل طريقة لاستخدامه في موضوع مهم؟",o:["مشاركة بيانات شخصية حساسة","اعتماد الإجابة دون مراجعة","تقديم طلب واضح والتحقق من المعلومات"],a:2,e:"حدد المطلوب وراجع الحقائق، خصوصاً الأرقام والقرارات المهمة."}
+],
+en:[
+{q:"What does generative AI do?",o:["Creates new content based on learned patterns","Guarantees every fact is correct","Works without training data"],a:0,e:"It generates content such as text and images based on patterns learned during training."},
+{q:"Does a convincing answer mean it is always correct?",o:["Yes, always","No, it can contain errors","Only when it is long"],a:1,e:"Outputs can sound convincing while still containing mistakes."},
+{q:"What is a good practice when using it for an important topic?",o:["Share sensitive personal data","Accept the answer without review","Give a clear prompt and verify information"],a:2,e:"Be clear about the task and verify facts, especially numbers and important decisions."}
+]};
+function renderAiQuiz(lang){
+ const root=document.getElementById("aiQuizQuestions");root.replaceChildren();
+ document.getElementById("aiQuizTitle").textContent=lang==="ar"?"اختبر معلوماتك":"Test your knowledge";
+ document.getElementById("aiQuizIntro").textContent=lang==="ar"?"ثلاثة أسئلة سريعة حول الذكاء الاصطناعي التوليدي.":"Three quick questions about generative AI.";
+ document.getElementById("aiQuizSubmit").textContent=lang==="ar"?"تحقق من الإجابات":"Check answers";
+ document.getElementById("aiQuizResult").textContent=lang==="ar"?"اختر إجابة لكل سؤال.":"Choose one answer for each question.";
+ aiQuizData[lang].forEach((q,i)=>{const box=document.createElement("div");box.className="quiz-question";const title=document.createElement("strong");title.textContent=(i+1)+". "+q.q;box.append(title);const opts=document.createElement("div");opts.className="quiz-options";q.o.forEach((o,j)=>{const label=document.createElement("label");label.className="quiz-option";const input=document.createElement("input");input.type="radio";input.name="ai-q"+i;input.value=j;const span=document.createElement("span");span.textContent=o;label.append(input,span);opts.append(label)});box.append(opts);root.append(box)});
+}
+document.getElementById("aiQuizSubmit").addEventListener("click",()=>{let score=0,answered=0;aiQuizData[language].forEach((q,i)=>{const selected=document.querySelector('input[name="ai-q'+i+'"]:checked');const box=document.querySelectorAll("#aiQuizQuestions .quiz-question")[i];box.querySelectorAll(".quiz-option").forEach((label,j)=>{label.classList.toggle("correct",j===q.a);label.classList.toggle("incorrect",!!selected&&j===Number(selected.value)&&j!==q.a)});let fb=box.querySelector(".quiz-feedback");if(!fb){fb=document.createElement("div");fb.className="quiz-feedback";box.append(fb)}fb.textContent=q.e;if(selected){answered++;if(Number(selected.value)===q.a)score++}});document.getElementById("aiQuizResult").textContent=language==="ar"?"نتيجتك: "+score+" من 3 — أجبت عن "+answered+" أسئلة.":"Your score: "+score+" out of 3 — answered "+answered+" questions.";});
+renderAiQuiz(language);
+
 </script>
 </body></html>
