@@ -238,3 +238,23 @@ footer:not(.footer) p{display:flex;flex-wrap:wrap;gap:8px 15px}
 .quiz-feedback{margin-top:8px;color:#637795;font-size:12px}
 @keyframes orbitPulse{50%{transform:rotate(4deg) scale(1.015)}}
 @media(max-width:560px){.knowledge-quiz{padding:18px 15px}.knowledge-quiz h2{font-size:18px}.moon-diagram{min-height:225px}.moon-orbit{width:175px;height:175px}}
+
+/* Interactive planning and travel checklist */
+.task-planner,.trip-checklist{margin:30px 0;padding:22px;border:1px solid #dce6f7;border-radius:21px;background:linear-gradient(145deg,#f8faff,#fff 70%,#faf8ff)}
+.task-planner h2,.trip-checklist h2{margin:8px 0;color:#1d3967;font-size:21px}
+.task-planner p,.trip-checklist p{color:#6d7e99;font-size:13px;line-height:1.8}
+.task-entry{display:flex;gap:8px;margin:14px 0}
+.task-entry input{flex:1;min-width:0;padding:12px;border:1px solid #dce4f2;border-radius:11px;font:inherit}
+.task-entry button{padding:10px 15px;border:0;border-radius:11px;background:#416ee8;color:#fff;font-weight:800}
+.task-list{display:grid;gap:8px;padding:0;list-style:none}
+.task-row{display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid #e4eaf5;border-radius:12px;background:#fff;color:#415575;font-size:13px}
+.task-row input,.trip-check-row input{accent-color:#5278dc;width:17px;height:17px}
+.task-row.done span{text-decoration:line-through;color:#98a3b5}
+.task-progress{height:7px;margin:12px 0;background:#e7edf8;border-radius:99px;overflow:hidden}
+.task-progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,#4b79e8,#8b71df);transition:width .2s}
+.trip-check-group{margin-top:15px}
+.trip-check-group h3{font-size:14px;color:#4263a2;margin:0 0 8px}
+.trip-check-row{display:flex;align-items:flex-start;gap:10px;padding:10px 11px;margin:6px 0;border:1px solid #e4eaf5;border-radius:11px;background:#fff;color:#465977;font-size:13px;line-height:1.6}
+.trip-check-row:has(input:checked){background:#f3f8ff;border-color:#cbdaf6}
+.trip-check-row input{flex:none;margin-top:3px}
+@media(max-width:560px){.task-planner,.trip-checklist{padding:18px 14px}.task-planner h2,.trip-checklist h2{font-size:18px}.task-entry button{padding:9px 11px}}
