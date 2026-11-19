@@ -162,6 +162,21 @@ function updateReadingProgress(){
 window.addEventListener("scroll",updateReadingProgress,{passive:true});
 window.addEventListener("resize",updateReadingProgress);
 updateReadingProgress();
+const relatedData={"generative-ai":["ما هو الذكاء الاصطناعي التوليدي؟","What is generative AI?","التقنية والذكاء الاصطناعي","Technology & AI"],"car-tire-maintenance":["كيف تحافظ على إطارات سيارتك؟","How to maintain your car tires","السيارات والنقل","Cars & Transport"],"saving-vs-investing":["ما الفرق بين الادخار والاستثمار؟","Saving vs. investing","المال والاقتصاد","Money & Economy"],"moon-phases":["لماذا نرى القمر بأشكال مختلفة؟","Why does the Moon appear to change shape?","العلوم والمعرفة","Science & Knowledge"],"trip-planning":["كيف تخطط لرحلة ناجحة؟","How to plan a successful trip","السفر والجغرافيا","Travel & Geography"],"daily-task-planning":["كيف تنظم مهامك اليومية؟","How to organize daily tasks","الحياة اليومية","Everyday Life"],"strong-passwords":["كيف تنشئ كلمة مرور قوية؟","How to create a strong password","التطبيقات والخدمات","Apps & Services"],"monthly-budget":["كيف تضع ميزانية شهرية واقعية؟","How to build a realistic monthly budget","المال والاقتصاد","Money & Economy"],"phishing-awareness":["كيف تتعرف على رسائل التصيد الإلكتروني؟","How to recognize phishing messages","التطبيقات والخدمات","Apps & Services"],"road-trip-checklist":["قائمة فحص السيارة قبل السفر البري","Pre-trip vehicle safety checklist","السيارات والنقل","Cars & Transport"]};
+const relatedSlugs=["strong-passwords","generative-ai","daily-task-planning"];
+const relatedSection=document.createElement("section");relatedSection.className="related-articles";relatedSection.id="relatedArticles";
+const relatedTitle=document.createElement("h2");relatedTitle.className="related-title";relatedTitle.dataset.ar="قد يهمك أيضاً";relatedTitle.dataset.en="You may also like";relatedTitle.textContent=language==="ar"?"قد يهمك أيضاً":"You may also like";
+const relatedGrid=document.createElement("div");relatedGrid.className="related-grid";
+relatedSlugs.forEach((relatedSlug,index)=>{
+ const data=relatedData[relatedSlug];const link=document.createElement("a");link.className="related-card";link.href="./"+relatedSlug+".html";
+ const label=document.createElement("span");label.className="related-category";label.dataset.ar=data[2];label.dataset.en=data[3];label.textContent=language==="ar"?data[2]:data[3];
+ const title=document.createElement("strong");title.dataset.ar=data[0];title.dataset.en=data[1];title.textContent=language==="ar"?data[0]:data[1];
+ const arrow=document.createElement("span");arrow.className="related-arrow";arrow.textContent="↗";
+ link.append(label,title,arrow);relatedGrid.appendChild(link);
+});
+relatedSection.append(relatedTitle,relatedGrid);
+const articleNav=document.querySelector(".article-navigation");
+if(articleNav)articleNav.before(relatedSection);else document.querySelector(".article").appendChild(relatedSection);
 document.getElementById("lang").onclick=()=>{language=language==="ar"?"en":"ar";applyLanguage()};
 </script>
 </body></html>
