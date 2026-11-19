@@ -142,6 +142,26 @@ body{background:radial-gradient(ellipse at 8% 18%,#eaf0ff 0,transparent 31%),rad
 @media(max-width:600px){#categories{padding-top:25px;padding-bottom:22px}.cats{gap:10px}.cat{min-height:98px;padding:13px 11px;gap:10px;border-radius:17px}.cat .ico{width:43px;height:43px;border-radius:14px}.cat .ico svg{width:24px;height:24px}.cat b{font-size:12px;line-height:1.6}.cat small{font-size:9px}.cat .cat-arrow{font-size:14px}#latest{padding-top:28px}}
 @media(max-width:390px){.cats{grid-template-columns:1fr}.cat{min-height:82px}.cat b{font-size:14px}.cat small{font-size:10px}}
 
+
+/* Editorial article cards — no emoji thumbnails */
+.articles{align-items:stretch}
+.article-card{display:flex;flex-direction:column;min-width:0;padding:0!important;overflow:hidden;border-radius:22px!important;background:#fff!important}
+.article-card .thumb{height:150px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;background:linear-gradient(135deg,#e9f0ff,#f2edff 58%,#e7f6fb);border-bottom:1px solid #e7ecf7}
+.article-card:nth-child(3n+2) .thumb{background:linear-gradient(135deg,#e9f6f8,#edf0ff 60%,#f4efff)}
+.article-card:nth-child(3n+3) .thumb{background:linear-gradient(135deg,#f1edff,#eaf1ff 58%,#eef8fb)}
+.article-card .thumb:after{content:"";position:absolute;width:122px;height:122px;border:1px solid #6689d833;border-radius:50%;box-shadow:0 0 0 16px #6689d80b,0 0 0 34px #6689d808}
+.thumb-symbol{position:relative;z-index:1;width:70px;height:70px;display:grid;place-items:center;border:1px solid #ffffffb8;border-radius:22px;background:linear-gradient(145deg,#ffffffd9,#f6f8ffb8);box-shadow:0 14px 35px #284c901c;color:#416ee8}
+.thumb-symbol svg{width:36px;height:36px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.thumb-kicker{position:absolute;z-index:1;inset-inline-start:16px;top:15px;font-size:9px;font-weight:850;letter-spacing:1.8px;color:#7084b2;direction:ltr}
+.thumb-orbit{position:absolute;width:190px;height:70px;border:1px solid #829bdb26;border-radius:50%;transform:rotate(-28deg)}
+.article-card .cardbody{display:flex;flex-direction:column;align-items:flex-start;flex:1;padding:21px}
+.article-card h3{margin:11px 0 8px;font-size:18px;line-height:1.6}
+.article-card p{font-size:13px;line-height:1.9;min-height:52px;color:#71809a}
+.article-card .read{margin-top:auto;display:inline-flex;align-items:center;gap:8px;padding-top:9px;color:#416ee8}
+.article-card .read span{font-size:17px;transition:transform .2s}
+.article-card:hover .read span{transform:translate(3px,-2px)}
+@media(max-width:650px){.article-card .thumb{height:126px}.thumb-symbol{width:60px;height:60px;border-radius:19px}.thumb-symbol svg{width:31px;height:31px}.article-card .cardbody{padding:17px}.article-card h3{font-size:16px}.article-card p{font-size:12px;min-height:0}}
+
 </style>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"المعلومة الذكية – Smart Info Encyclopedia","url":"https://smart-info-encyclopedia-site.pages.dev/","inLanguage":["ar","en"],"description":"موسوعة معرفية تقدم شروحات ومعلومات مبسطة بالعربية والإنجليزية."}</script>
 </head>
@@ -186,7 +206,15 @@ return '<a class="cat'+(filter===c.id?' active':'')+'" href="#latest" data-cat="
 }).join("");
 document.querySelectorAll("[data-cat]").forEach(el=>el.onclick=()=>{filter=el.dataset.cat;renderCats();renderPosts()});
 }
-function renderPosts(){const list=posts.filter(p=>(filter==="all"||p.cat===filter)&&((p.ar+" "+p.en+" "+p.descAr+" "+p.descEn).toLowerCase().includes(query)));document.getElementById("resultsMeta").textContent=t("عدد المقالات: ","Articles: ")+list.length;document.getElementById("articles").innerHTML=list.map(p=>'<article class="card"><div class="thumb">'+p.icon+'</div><div class="cardbody"><div class="tag">'+t(cats.find(c=>c.id===p.cat).ar,cats.find(c=>c.id===p.cat).en)+'</div><h3>'+t(p.ar,p.en)+'</h3><p>'+t(p.descAr,p.descEn)+'</p><a class="read" href="articles/'+p.slug+'.html">'+t("اقرأ المقال ←","Read article →")+'</a></div></article>').join("");document.getElementById("empty").style.display=list.length?"none":"block";document.querySelectorAll("[data-open]").forEach(el=>el.onclick=e=>{e.preventDefault();openPost(+el.dataset.open)})}
+function renderPosts(){
+const list=posts.filter(p=>(filter==="all"||p.cat===filter)&&((p.ar+" "+p.en+" "+p.descAr+" "+p.descEn).toLowerCase().includes(query)));
+document.getElementById("resultsMeta").textContent=t("عدد المقالات: ","Articles: ")+list.length;
+document.getElementById("articles").innerHTML=list.map((p,index)=>{
+const category=cats.find(item=>item.id===p.cat);
+return '<article class="card article-card"><div class="thumb"><span class="thumb-symbol">'+category.icon+'</span><span class="thumb-kicker">SMART INFO / '+String(index+1).padStart(2,"0")+'</span><span class="thumb-orbit"></span></div><div class="cardbody"><div class="tag">'+t(category.ar,category.en)+'</div><h3>'+t(p.ar,p.en)+'</h3><p>'+t(p.descAr,p.descEn)+'</p><a class="read" href="articles/'+p.slug+'.html">'+t("اقرأ المقال","Read article")+' <span aria-hidden="true">↗</span></a></div></article>';
+}).join("");
+document.getElementById("empty").style.display=list.length?"none":"block";
+}
 function openPost(i){const p=posts[i];document.getElementById("detail").innerHTML='<div class="tag">'+t(cats.find(c=>c.id===p.cat).ar,cats.find(c=>c.id===p.cat).en)+'</div><h2>'+t(p.ar,p.en)+'</h2><p style="white-space:pre-line;line-height:2">'+t(p.bodyAr,p.bodyEn)+'</p><p style="font-size:12px;color:#7a8d9c">'+t("محتوى تعليمي عام. تحقق من المصادر الرسمية في المسائل المتغيرة أو الحساسة.","General educational content. Check official sources for changing or sensitive matters.")+'</p>';document.getElementById("modal").classList.add("open")}
 function setLang(next){lang=next;document.documentElement.lang=lang;document.documentElement.dir=lang==="ar"?"rtl":"ltr";document.querySelectorAll("[data-ar]").forEach(el=>{el.innerHTML=el.dataset[lang]});document.getElementById("lang").textContent=lang==="ar"?"English":"العربية";document.getElementById("q").placeholder=t("ابحث عن معلومة...","Search for information...");renderCats();renderPosts()}
 document.getElementById("lang").onclick=()=>setLang(lang==="ar"?"en":"ar");document.getElementById("searchBtn").onclick=()=>{query=document.getElementById("q").value.trim().toLowerCase();filter="all";renderPosts()};document.getElementById("q").addEventListener("input",()=>{query=document.getElementById("q").value.trim().toLowerCase();filter="all";renderPosts()});document.getElementById("q").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("searchBtn").click()});document.getElementById("close").onclick=()=>document.getElementById("modal").classList.remove("open");document.getElementById("modal").onclick=e=>{if(e.target.id==="modal")e.currentTarget.classList.remove("open")};renderCats();renderPosts();
