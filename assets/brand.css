@@ -209,3 +209,32 @@ footer:not(.footer) p{display:flex;flex-wrap:wrap;gap:8px 15px}
 .tool-result[data-negative="true"]{color:#b44b53;border-color:#f0d8da;background:#fffafb}
 .interactive-tool small{display:block;margin-top:11px;color:#7a879c;font-size:11px;line-height:1.8}
 @media(max-width:560px){.interactive-tool{padding:18px 15px;border-radius:17px}.interactive-tool h2{font-size:18px}.tool-fields{grid-template-columns:1fr;gap:10px}.tool-button{width:100%}}
+
+/* Educational diagrams and knowledge checks */
+.learning-figure{margin:28px 0;padding:18px;border:1px solid #dfe8f7;border-radius:20px;background:linear-gradient(145deg,#f8faff,#fff);text-align:center}
+.moon-diagram{position:relative;min-height:255px;display:grid;place-items:center;overflow:hidden;border-radius:15px;background:radial-gradient(circle at center,#f6f8ff,#edf2ff)}
+.moon-orbit{position:absolute;width:205px;height:205px;border:1px dashed #91a8d5;border-radius:50%;animation:orbitPulse 7s ease-in-out infinite}
+.moon-earth{position:absolute;z-index:2;width:58px;height:58px;display:grid;place-content:center;border-radius:50%;background:linear-gradient(145deg,#4d91db,#244a91);color:#fff;font-size:10px;font-weight:800;box-shadow:0 8px 20px #244a9133}
+.moon-sun{position:absolute;inset-inline-start:16%;top:18%;font-size:33px;color:#e9ae43;text-shadow:0 4px 12px #f3c45b88}
+.moon-center-label{position:absolute;bottom:12px;color:#7184a8;font-size:10px;font-weight:800}
+.moon-phase{position:absolute;width:25px;height:25px;border-radius:50%;background:#263d70;box-shadow:0 2px 9px #263d7033}
+.phase-new{top:-12px;left:calc(50% - 12px);background:#29334b}
+.phase-crescent{right:8px;top:42px;background:linear-gradient(90deg,#29334b 48%,#f4d98a 50%)}
+.phase-quarter{right:-12px;top:calc(50% - 12px);background:linear-gradient(90deg,#f4d98a 50%,#29334b 50%)}
+.phase-gibbous{right:8px;bottom:42px;background:linear-gradient(90deg,#f4d98a 75%,#29334b 76%)}
+.phase-full{bottom:-12px;left:calc(50% - 12px);background:#f4d98a}
+.phase-waning{left:8px;bottom:42px;background:linear-gradient(90deg,#29334b 25%,#f4d98a 26%)}
+.learning-figure figcaption{margin-top:12px;color:#71809a;font-size:12px;line-height:1.8}
+.knowledge-quiz{margin:30px 0;padding:23px;border:1px solid #dce6f7;border-radius:21px;background:linear-gradient(145deg,#f8faff,#fff 70%,#faf8ff)}
+.knowledge-quiz h2{margin:8px 0;color:#1d3967;font-size:21px}
+.knowledge-quiz>p{margin:0 0 18px;color:#6d7e99;font-size:13px}
+.quiz-question{padding:14px 0;border-top:1px solid #e7edf7}
+.quiz-question strong{display:block;margin-bottom:10px;color:#2b4167;font-size:14px}
+.quiz-options{display:grid;gap:8px}
+.quiz-option{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;border:1px solid #e2e9f5;border-radius:11px;background:#fff;color:#52627c;font-size:13px;cursor:pointer}
+.quiz-option input{margin-top:3px;accent-color:#5278dc}
+.quiz-option.correct{border-color:#91c9a8;background:#f2fbf5}
+.quiz-option.incorrect{border-color:#e8b3b3;background:#fff6f6}
+.quiz-feedback{margin-top:8px;color:#637795;font-size:12px}
+@keyframes orbitPulse{50%{transform:rotate(4deg) scale(1.015)}}
+@media(max-width:560px){.knowledge-quiz{padding:18px 15px}.knowledge-quiz h2{font-size:18px}.moon-diagram{min-height:225px}.moon-orbit{width:175px;height:175px}}
