@@ -1,1 +1,36 @@
-<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,follow"><title>الصفحة غير موجودة</title><style>body{font:18px system-ui;text-align:center;padding:15vh 20px;color:#102b46;background:#f7fafc}a{display:inline-block;background:#102b46;color:white;padding:10px 18px;border-radius:10px;text-decoration:none}</style><h1>404</h1><p>عذراً، الصفحة التي تبحث عنها غير موجودة.</p><a href="/">العودة للرئيسية</a></html>
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,follow"><meta name="theme-color" content="#102b46">
+<link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/brand.css">
+<title>الصفحة غير موجودة | المعلومة الذكية</title>
+<style>
+.error-wrap{width:min(760px,calc(100% - 32px));margin:clamp(35px,9vh,90px) auto}
+.error-card{text-align:center;background:#fff;border:1px solid #e3eaf5;border-radius:28px;padding:clamp(28px,6vw,58px);box-shadow:0 22px 60px #102b4612}
+.error-code{font-size:clamp(64px,14vw,112px);font-weight:900;line-height:1;background:linear-gradient(120deg,#3268d5,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:-5px}
+.error-card h1{margin:18px 0 10px;color:#10264a;font-size:clamp(25px,5vw,36px)}
+.error-card p{color:#71809a;line-height:2;margin:0 auto 25px;max-width:520px}
+.error-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.error-actions a{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:10px 20px;border-radius:13px;text-decoration:none;font-weight:750}
+.error-primary{background:linear-gradient(135deg,#416ee8,#7c63df);color:#fff!important;box-shadow:0 9px 22px #416ee833}
+.error-secondary{background:#f0f4ff;color:#315bb4!important;border:1px solid #dfe7fa}
+@media(max-width:520px){.error-card{border-radius:21px}.error-actions a{width:100%}}
+</style></head>
+<body>
+<header class="top"><div class="nav"><a href="index.html">المعلومة الذكية | SMART INFO</a><button class="lang" id="lang" type="button">English</button></div></header>
+<main class="error-wrap"><section class="error-card" aria-labelledby="error-title">
+<div class="error-code" aria-hidden="true">404</div>
+<h1 id="error-title" data-ar="عذراً، الصفحة غير موجودة" data-en="Sorry, this page could not be found">عذراً، الصفحة غير موجودة</h1>
+<p data-ar="قد يكون الرابط غير صحيح أو أن الصفحة نُقلت. يمكنك العودة إلى الصفحة الرئيسية أو استكشاف مقالات الموسوعة." data-en="The link may be incorrect or the page may have moved. You can return home or explore the encyclopedia articles.">قد يكون الرابط غير صحيح أو أن الصفحة نُقلت. يمكنك العودة إلى الصفحة الرئيسية أو استكشاف مقالات الموسوعة.</p>
+<div class="error-actions"><a class="error-primary" href="index.html" data-ar="العودة إلى الرئيسية" data-en="Back to homepage">العودة إلى الرئيسية</a><a class="error-secondary" href="index.html#articles" data-ar="استكشف المقالات" data-en="Explore articles">استكشف المقالات</a></div>
+</section></main>
+<footer class="footer"><div class="footer-inner"><div><strong data-ar="المعلومة الذكية" data-en="Smart Info">المعلومة الذكية</strong><p data-ar="المعلومة الصحيحة تبدأ من هنا." data-en="The right information starts here.">المعلومة الصحيحة تبدأ من هنا.</p></div><nav aria-label="Footer navigation"><a href="about.html" data-ar="من نحن" data-en="About">من نحن</a><a href="contact.html" data-ar="اتصل بنا" data-en="Contact">اتصل بنا</a><a href="privacy.html" data-ar="الخصوصية" data-en="Privacy">الخصوصية</a></nav></div></footer>
+<script>
+let language="ar";
+document.getElementById("lang").addEventListener("click",()=>{
+language=language==="ar"?"en":"ar";document.documentElement.lang=language;document.documentElement.dir=language==="ar"?"rtl":"ltr";
+document.querySelectorAll("[data-ar]").forEach(el=>el.textContent=el.dataset[language]);
+document.getElementById("lang").textContent=language==="ar"?"English":"العربية";
+});
+</script></body></html>
