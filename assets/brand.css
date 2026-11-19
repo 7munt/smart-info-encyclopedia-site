@@ -194,3 +194,18 @@ footer:not(.footer) p{display:flex;flex-wrap:wrap;gap:8px 15px}
 .article .topic-icon svg{position:relative;z-index:1;width:62px;height:62px;padding:12px;border:1px solid #ffffffc9;border-radius:19px;background:linear-gradient(145deg,#ffffffed,#f7f8ffdd);box-shadow:0 12px 28px #24477e18;stroke:currentColor}
 .topic-icon-label{position:absolute;z-index:1;inset-inline-start:17px;top:15px;color:#8b9abd;font-size:9px;font-weight:850;letter-spacing:1.7px;direction:ltr}
 @media(max-width:640px){.article .topic-icon{height:112px;margin-bottom:18px;border-radius:18px}.article .topic-icon svg{width:54px;height:54px}.topic-icon-label{top:12px;inset-inline-start:13px;font-size:8px}}
+
+/* Lightweight bilingual interactive article tools */
+.interactive-tool{margin:30px 0;padding:24px;border:1px solid #dce6f7;border-radius:22px;background:linear-gradient(145deg,#f8faff,#fff 62%,#faf8ff);box-shadow:0 14px 34px #25477d0d}
+.interactive-tool .tool-kicker{font-size:10px;letter-spacing:1.5px;font-weight:900;color:#6280c2}
+.interactive-tool h2{margin:8px 0 7px;color:#1d3967;font-size:21px}
+.interactive-tool>p{margin:0 0 18px;color:#667895;font-size:13px;line-height:1.8}
+.tool-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.tool-fields label{display:flex;flex-direction:column;gap:7px;color:#435778;font-size:12px;font-weight:750}
+.tool-fields input{width:100%;min-width:0;padding:12px 13px;border:1px solid #dce4f2;border-radius:12px;background:#fff;color:#1b3154;font:inherit;outline:none}
+.tool-fields input:focus{border-color:#7898ed;box-shadow:0 0 0 3px #7898ed22}
+.tool-button{margin-top:16px;padding:11px 18px;border:0;border-radius:12px;background:linear-gradient(100deg,#416ee8,#7964d8);color:white;font:inherit;font-size:13px;font-weight:800;cursor:pointer}
+.tool-result{margin-top:14px;padding:14px 16px;border:1px solid #dce7fb;border-radius:13px;background:#fff;color:#2854ad;font-size:17px;font-weight:850;line-height:1.6}
+.tool-result[data-negative="true"]{color:#b44b53;border-color:#f0d8da;background:#fffafb}
+.interactive-tool small{display:block;margin-top:11px;color:#7a879c;font-size:11px;line-height:1.8}
+@media(max-width:560px){.interactive-tool{padding:18px 15px;border-radius:17px}.interactive-tool h2{font-size:18px}.tool-fields{grid-template-columns:1fr;gap:10px}.tool-button{width:100%}}
