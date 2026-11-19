@@ -35,3 +35,9 @@ body{font-family:Inter,system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-seri
 .lang{border-radius:12px!important;padding:8px 15px!important}
 a:focus-visible,button:focus-visible{outline:3px solid #7aa2ff!important;outline-offset:3px}
 @media(max-width:640px){.article{padding:22px!important;border-radius:20px!important}.article .body{font-size:15.5px!important;line-height:2.05!important}.wrap{margin-top:24px!important}}
+
+
+/* Unified brand signature for every inner-page header */
+.top a:first-child::before,.nav a:first-child::before{content:"";display:inline-block;vertical-align:middle;width:34px;height:34px;margin-inline-end:10px;border-radius:11px;background:linear-gradient(145deg,#142d58,#263f78);border:1px solid #91b9ff66;box-shadow:0 5px 18px #2563eb30; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M8 17c8-4 16-4 24 2v32c-8-6-16-6-24-2zM56 17c-8-4-16-4-24 2v32c8-6 16-6 24-2z' fill='none' stroke='%2393c5fd' stroke-width='4' stroke-linejoin='round'/%3E%3Cpath d='M32 19v32M43 8l3 7 7 3-7 3-3 7-3-7-7-3 7-3z' fill='%23c4b5fd'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center;background-size:25px}
+.top a:first-child,.nav a:first-child{display:inline-flex;align-items:center}
+@media(max-width:600px){.top a:first-child::before,.nav a:first-child::before{width:30px;height:30px;background-size:22px;margin-inline-end:8px}}
