@@ -115,6 +115,7 @@ If you do not finish every task, do not automatically move the entire list to th
 سؤال شائع: ماذا أفعل إذا لم أنجز كل القائمة؟
 القائمة أداة لاتخاذ القرار وليست اختباراً للنجاح. راجع تقدير الوقت والأولويات، وقلل عدد المهام أو جزّئها بصورة أفضل.</div>
 <div class="references" style="border-top:1px solid #e3eaf0;margin-top:24px;padding-top:16px;font-size:14px"><strong data-ar="مصادر ومراجع للتوسع" data-en="Further reading">مصادر ومراجع للتوسع</strong><p><a href="https://learningcenter.unc.edu/tips-and-tools/" target="_blank" rel="noopener noreferrer" style="color:#17638b" data-ar="موارد وأدوات التعلم – مركز التعلم بجامعة نورث كارولاينا" data-en="Tips &amp; Tools – UNC Learning Center">موارد وأدوات التعلم – مركز التعلم بجامعة نورث كارولاينا</a></p></div>\n<div class="note" data-ar="هذا المحتوى تعليمي عام. تحقق من المصادر الرسمية في المسائل المتغيرة أو الحساسة، ولا تعتبره بديلاً عن استشارة المختصين." data-en="This is general educational content. Check official sources for changing or sensitive matters; it is not a substitute for professional advice.">هذا المحتوى تعليمي عام. تحقق من المصادر الرسمية في المسائل المتغيرة أو الحساسة، ولا تعتبره بديلاً عن استشارة المختصين.</div>
+<section class="task-planner" id="taskPlanner"><div class="tool-kicker">SMART INFO • DAILY PLANNER</div><h2 id="taskTitle">خطط مهامك اليوم</h2><p id="taskIntro">أضف مهامك وحدد ما أنجزته لمتابعة تقدمك.</p><div class="task-entry"><input id="taskInput" type="text" maxlength="90" placeholder="اكتب مهمة جديدة" aria-label="New task"><button id="taskAdd" type="button">إضافة</button></div><div id="taskCount">0 / 0 مكتملة</div><div class="task-progress"><span id="taskProgressBar"></span></div><ul class="task-list" id="taskList"></ul></section>
 <nav class="article-navigation" aria-label="Article navigation">
 <a class="article-nav-link prev" href="./trip-planning.html"><span class="nav-direction" data-ar="المقال السابق" data-en="Previous article">المقال السابق</span><strong>←</strong></a>
 <a class="article-nav-link next" href="./strong-passwords.html"><span class="nav-direction" data-ar="المقال التالي" data-en="Next article">المقال التالي</span><strong>→</strong></a>
@@ -150,7 +151,7 @@ function applyLanguage(){
  document.querySelectorAll("[data-ar]").forEach(el=>{if(el!==articleBody)el.textContent=el.dataset[language]});
  document.getElementById("lang").textContent=language==="ar"?"English":"العربية";
  renderArticle(language);
- updateReadingMeta();
+ updateReadingMeta();renderTaskPlanner();
 }
 renderArticle(language);
 const readingMeta=document.createElement("div");readingMeta.className="reading-meta";toc.before(readingMeta);
@@ -184,5 +185,23 @@ relatedSection.append(relatedTitle,relatedGrid);
 const articleNav=document.querySelector(".article-navigation");
 if(articleNav)articleNav.before(relatedSection);else document.querySelector(".article").appendChild(relatedSection);
 document.getElementById("lang").onclick=()=>{language=language==="ar"?"en":"ar";applyLanguage()};
+
+let dailyTasks=[];
+function renderTaskPlanner(){
+ const ar=language==="ar";document.getElementById("taskTitle").textContent=ar?"خطط مهامك اليوم":"Plan your day";
+ document.getElementById("taskIntro").textContent=ar?"أضف مهامك وحدد ما أنجزته لمتابعة تقدمك.":"Add tasks and check them off to track your progress.";
+ document.getElementById("taskInput").placeholder=ar?"اكتب مهمة جديدة":"Enter a new task";
+ document.getElementById("taskInput").setAttribute("aria-label",ar?"مهمة جديدة":"New task");
+ document.getElementById("taskAdd").textContent=ar?"إضافة":"Add task";
+ const list=document.getElementById("taskList");list.replaceChildren();
+ dailyTasks.forEach((task,index)=>{const li=document.createElement("li");li.className="task-row"+(task.done?" done":"");const cb=document.createElement("input");cb.type="checkbox";cb.checked=task.done;cb.setAttribute("aria-label",ar?"تم إنجاز المهمة":"Task completed");cb.addEventListener("change",()=>{dailyTasks[index].done=cb.checked;renderTaskPlanner()});const span=document.createElement("span");span.textContent=task.text;li.append(cb,span);list.append(li)});
+ const done=dailyTasks.filter(t=>t.done).length,total=dailyTasks.length;
+ document.getElementById("taskCount").textContent=ar?done+" / "+total+" مكتملة":done+" / "+total+" completed";
+ document.getElementById("taskProgressBar").style.width=(total?done/total*100:0)+"%";
+}
+document.getElementById("taskAdd").addEventListener("click",()=>{const input=document.getElementById("taskInput"),value=input.value.trim();if(!value)return;dailyTasks.push({text:value,done:false});input.value="";renderTaskPlanner();input.focus()});
+document.getElementById("taskInput").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("taskAdd").click()});
+renderTaskPlanner();
+
 </script>
 </body></html>
