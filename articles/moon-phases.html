@@ -109,6 +109,8 @@ Choose a safe place with a view of the sky and record the Moon's appearance, app
 سؤال شائع: لماذا لا نرى القمر دائماً ليلاً؟
 لأن وقت ظهور القمر يتغير مع طوره وموقعه في مداره؛ فقد يظهر في النهار أو بعد غروب الشمس أو في وقت متأخر من الليل.</div>
 <div class="references" style="border-top:1px solid #e3eaf0;margin-top:24px;padding-top:16px;font-size:14px"><strong data-ar="مصادر ومراجع للتوسع" data-en="Further reading">مصادر ومراجع للتوسع</strong><p><a href="https://science.nasa.gov/moon/moon-phases/" target="_blank" rel="noopener noreferrer" style="color:#17638b" data-ar="أطوار القمر – NASA" data-en="Moon Phases – NASA">أطوار القمر – NASA</a></p></div>\n<div class="note" data-ar="هذا المحتوى تعليمي عام. تحقق من المصادر الرسمية في المسائل المتغيرة أو الحساسة، ولا تعتبره بديلاً عن استشارة المختصين." data-en="This is general educational content. Check official sources for changing or sensitive matters; it is not a substitute for professional advice.">هذا المحتوى تعليمي عام. تحقق من المصادر الرسمية في المسائل المتغيرة أو الحساسة، ولا تعتبره بديلاً عن استشارة المختصين.</div>
+<figure class="learning-figure"><div class="moon-diagram" role="img" aria-label="Moon phases illustration"><div class="moon-sun">☀</div><div class="moon-earth">الأرض<br>Earth</div><div class="moon-orbit"><span class="moon-phase phase-new"></span><span class="moon-phase phase-crescent"></span><span class="moon-phase phase-quarter"></span><span class="moon-phase phase-gibbous"></span><span class="moon-phase phase-full"></span><span class="moon-phase phase-waning"></span></div><div class="moon-center-label" id="moonDiagramLabel">مراحل القمر / Moon phases</div></div><figcaption data-ar="رسم توضيحي مبسط: يتغير الجزء المضاء الذي نراه من الأرض مع تغير موقع القمر في مداره. الرسم ليس بمقياس رسم." data-en="Simplified illustration: the illuminated portion visible from Earth changes as the Moon moves along its orbit. Not to scale.">رسم توضيحي مبسط: يتغير الجزء المضاء الذي نراه من الأرض مع تغير موقع القمر في مداره. الرسم ليس بمقياس رسم.</figcaption></figure>
+<section class="knowledge-quiz" id="moonQuiz"><div class="tool-kicker">SMART INFO • QUICK QUIZ</div><h2 id="moonQuizTitle">اختبر معلوماتك</h2><p id="moonQuizIntro">ثلاثة أسئلة سريعة حول أطوار القمر.</p><div id="moonQuizQuestions"></div><button class="tool-button" type="button" id="moonQuizSubmit">تحقق من الإجابات</button><div class="tool-result" id="moonQuizResult" aria-live="polite">اختر إجابة لكل سؤال.</div></section>
 <nav class="article-navigation" aria-label="Article navigation">
 <a class="article-nav-link prev" href="./saving-vs-investing.html"><span class="nav-direction" data-ar="المقال السابق" data-en="Previous article">المقال السابق</span><strong>←</strong></a>
 <a class="article-nav-link next" href="./trip-planning.html"><span class="nav-direction" data-ar="المقال التالي" data-en="Next article">المقال التالي</span><strong>→</strong></a>
@@ -144,7 +146,7 @@ function applyLanguage(){
  document.querySelectorAll("[data-ar]").forEach(el=>{if(el!==articleBody)el.textContent=el.dataset[language]});
  document.getElementById("lang").textContent=language==="ar"?"English":"العربية";
  renderArticle(language);
- updateReadingMeta();
+ updateReadingMeta();renderMoonQuiz(language);
 }
 renderArticle(language);
 const readingMeta=document.createElement("div");readingMeta.className="reading-meta";toc.before(readingMeta);
@@ -178,5 +180,29 @@ relatedSection.append(relatedTitle,relatedGrid);
 const articleNav=document.querySelector(".article-navigation");
 if(articleNav)articleNav.before(relatedSection);else document.querySelector(".article").appendChild(relatedSection);
 document.getElementById("lang").onclick=()=>{language=language==="ar"?"en":"ar";applyLanguage()};
+
+const moonQuizData={
+ar:[
+{q:"ما مصدر الضوء الذي نراه من القمر؟",o:["ضوء يصدره القمر بنفسه","ضوء الشمس المنعكس عن سطحه","ضوء الأرض"],a:1,e:"القمر يعكس ضوء الشمس ولا يصدر ضوءاً مرئياً من نفسه."},
+{q:"ما السبب الأساسي لأطوار القمر؟",o:["دوران الأرض حول نفسها","تغير الجزء المضاء الذي نراه من القمر","دخول القمر في ظل الأرض كل أسبوع"],a:1,e:"نرى أجزاء مختلفة من نصف القمر المضاء مع تغير موقعه بالنسبة إلى الأرض والشمس."},
+{q:"كم تستغرق المدة بين محاقين متتاليين تقريباً؟",o:["7 أيام","27.3 يوماً","29.5 يوماً"],a:2,e:"الشهر الاقتراني يستغرق نحو 29.5 يوماً في المتوسط."}
+],
+en:[
+{q:"What is the source of the Moon’s visible light?",o:["The Moon produces its own visible light","Sunlight reflected by the Moon","Light from Earth"],a:1,e:"The Moon reflects sunlight; it does not produce visible light of its own."},
+{q:"What mainly causes the phases of the Moon?",o:["Earth’s daily rotation","The changing portion of the Moon’s lit half that we see","The Moon entering Earth’s shadow every week"],a:1,e:"We see different portions of the Moon’s sunlit half as its position changes."},
+{q:"About how long is the time between two successive new moons?",o:["7 days","27.3 days","29.5 days"],a:2,e:"The synodic month averages about 29.5 days."}
+]};
+function renderMoonQuiz(lang){
+ const root=document.getElementById("moonQuizQuestions");root.replaceChildren();
+ document.getElementById("moonQuizTitle").textContent=lang==="ar"?"اختبر معلوماتك":"Test your knowledge";
+ document.getElementById("moonQuizIntro").textContent=lang==="ar"?"ثلاثة أسئلة سريعة حول أطوار القمر.":"Three quick questions about the Moon’s phases.";
+ document.getElementById("moonQuizSubmit").textContent=lang==="ar"?"تحقق من الإجابات":"Check answers";
+ document.getElementById("moonQuizResult").textContent=lang==="ar"?"اختر إجابة لكل سؤال.":"Choose one answer for each question.";
+ document.getElementById("moonDiagramLabel").textContent=lang==="ar"?"مراحل القمر":"Moon phases";
+ moonQuizData[lang].forEach((q,i)=>{const box=document.createElement("div");box.className="quiz-question";const title=document.createElement("strong");title.textContent=(i+1)+". "+q.q;box.append(title);const opts=document.createElement("div");opts.className="quiz-options";q.o.forEach((o,j)=>{const label=document.createElement("label");label.className="quiz-option";const input=document.createElement("input");input.type="radio";input.name="moon-q"+i;input.value=j;const span=document.createElement("span");span.textContent=o;label.append(input,span);opts.append(label)});box.append(opts);root.append(box)});
+}
+document.getElementById("moonQuizSubmit").addEventListener("click",()=>{let score=0,answered=0;moonQuizData[language].forEach((q,i)=>{const selected=document.querySelector('input[name="moon-q'+i+'"]:checked');const box=document.querySelectorAll("#moonQuizQuestions .quiz-question")[i];box.querySelectorAll(".quiz-option").forEach((label,j)=>{label.classList.toggle("correct",j===q.a);label.classList.toggle("incorrect",!!selected&&j===Number(selected.value)&&j!==q.a)});let fb=box.querySelector(".quiz-feedback");if(!fb){fb=document.createElement("div");fb.className="quiz-feedback";box.append(fb)}fb.textContent=q.e;if(selected){answered++;if(Number(selected.value)===q.a)score++}});document.getElementById("moonQuizResult").textContent=language==="ar"?"نتيجتك: "+score+" من 3 — أجبت عن "+answered+" أسئلة.":"Your score: "+score+" out of 3 — answered "+answered+" questions.";});
+renderMoonQuiz(language);
+
 </script>
 </body></html>
