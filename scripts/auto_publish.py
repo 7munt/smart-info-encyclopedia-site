@@ -224,7 +224,28 @@ def build_html(a, sources):
 })();
 </script></body></html>'''
 
+def install_analytics_on_existing_articles():
+ tag = """<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KQ2NGJXXKC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-KQ2NGJXXKC');
+</script>
+"""
+ changed = 0
+ for path in (ROOT / "articles").glob("*.html"):
+  page = path.read_text(encoding="utf-8")
+  if "G-KQ2NGJXXKC" in page: continue
+  marker = '<meta charset="utf-8">'
+  if marker not in page: continue
+  path.write_text(page.replace(marker, marker + "\n" + tag, 1), encoding="utf-8")
+  changed += 1
+ print(f"Added Google Analytics to {changed} existing article pages.")
+
 def main():
+ install_analytics_on_existing_articles()
  if not API_KEY: raise SystemExit("GEMINI_API_KEY is not configured in repository secrets.")
  index,sitemap,slugs,titles=load_existing()
  count=max(1,min(3,int(os.getenv("ARTICLE_COUNT","3") or "3")))
