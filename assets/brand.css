@@ -272,3 +272,12 @@ h2,.article h2,.card h2{color:#24416e!important}
 .article .topic-icon,.article .icon{background:linear-gradient(145deg,#edf2ff,#f4f0fc)!important;border-color:#e0e7f3!important;color:#416bd0!important}
 .references,.article-toc,.interactive-tool,.knowledge-quiz,.task-planner,.trip-checklist{border-color:#e0e7f2!important}
 a:focus-visible,button:focus-visible{outline-color:#7896e3!important}
+
+/* Smart Info visual identity — article and policy pages */
+:root{--si-navy:#071b46;--si-blue:#245eea;--si-violet:#7652e8;--si-paper:#f4f7ff;--si-ink:#17294e;--si-line:#e1e8f8}
+body{background:radial-gradient(ellipse at 50% 0%,#e5edff 0,transparent 36%),var(--si-paper)!important;color:var(--si-ink)!important}
+.top{background:linear-gradient(105deg,#061a48,#09265d)!important}
+.mark{background:linear-gradient(145deg,#244ff0,#7955e9)!important;color:#fff!important}
+.article,.card{border-color:#e1e8f8!important;box-shadow:0 12px 34px #102c6610!important;border-radius:22px!important}
+h1,.article h1{color:#142b60!important}.crumb,.category,.tag{color:#4268c7!important}
+a{transition:color .2s}
