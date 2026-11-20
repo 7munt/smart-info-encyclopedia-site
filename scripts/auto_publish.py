@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Generate, independently review, and publish Arabic encyclopedia articles."""
-import os, re, json, html, time, unicodedata, datetime, pathlib, sys
+import os, re, json, html, time, unicodedata, datetime, pathlib, sys, socket, ipaddress
+from urllib.parse import urlparse, urljoin
 import requests
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -110,6 +111,21 @@ sources (مصفوفة من 3 إلى 5 مصادر أصلية موثوقة، لك�
  data["category_en"] = cat_en
  return data
 
+def is_public_https_url(url):
+ try:
+  parsed = urlparse(url)
+  if parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password:
+   return False
+  if parsed.port not in (None, 443):
+   return False
+  host = parsed.hostname.rstrip(".").lower()
+  if host in ("localhost",) or host.endswith((".localhost", ".local", ".internal")):
+   return False
+  addresses = {item[4][0] for item in socket.getaddrinfo(host, 443, type=socket.SOCK_STREAM)}
+  return bool(addresses) and all(ipaddress.ip_address(addr).is_global for addr in addresses)
+ except (ValueError, OSError):
+  return False
+
 def verify_sources(sources):
  if not isinstance(sources, list) or len(sources) < 3:
   return False, [], "Need at least 3 candidate sources"
@@ -119,19 +135,34 @@ def verify_sources(sources):
  for src in sources[:6]:
   if not isinstance(src, dict): continue
   url=str(src.get("url","")).strip()
-  if not url.startswith("https://"):
-   failures.append("non-HTTPS source")
+  if not is_public_https_url(url):
+   failures.append("blocked unsafe or non-HTTPS source URL")
    continue
   try:
-   r=requests.get(url, timeout=15, headers=headers, allow_redirects=True, stream=True)
-   status=r.status_code
-   final_url=r.url
-   r.close()
-   if status < 400 and final_url.startswith("https://"):
+   current=url
+   response=None
+   for _ in range(6):
+    if not is_public_https_url(current):
+     raise ValueError("redirect target is not a public HTTPS URL")
+    response=requests.get(current, timeout=15, headers=headers, allow_redirects=False, stream=True)
+    if response.is_redirect or response.is_permanent_redirect:
+     target=urljoin(current, response.headers.get("Location", ""))
+     response.close()
+     current=target
+     continue
+    break
+   if response is None:
+    raise ValueError("source request did not complete")
+   status=response.status_code
+   final_url=current
+   response.close()
+   if status < 400:
     good.append({"title":str(src.get("title") or "Source"),"url":final_url})
    else:
     failures.append(f"{url} returned HTTP {status}")
-  except requests.RequestException as exc:
+  except (requests.RequestException, ValueError) as exc:
+   if response is not None:
+    response.close()
    failures.append(f"{url}: {type(exc).__name__}")
  if len(good) >= 2:
   return True, good, ""
@@ -273,7 +304,8 @@ def main():
    if not editorial_review(article,sources): raise ValueError("Editorial review did not approve")
    # The homepage data model is intentionally bilingual and uses plain text for bodyAr.
    post={"cat":category,"slug":slug,"icon":article["icon"],"ar":article["title_ar"],"en":article.get("title_en",article["title_ar"]),"descAr":article["description_ar"],"descEn":article.get("description_en",article["description_ar"]),"bodyAr":"\n\n".join(sec.get("heading_ar","")+"\n"+"\n".join(sec.get("paragraphs_ar",[])) for sec in article["sections"]),"bodyEn":article.get("summary_en","")}
-   index=index.replace("const posts=[","const posts=[\n"+json.dumps(post,ensure_ascii=False,separators=(",",":"))+",",1)
+   safe_post_json=json.dumps(post,ensure_ascii=False,separators=(",",":")).replace("<","\\u003c").replace(">","\\u003e").replace("&","\\u0026")
+   index=index.replace("const posts=[","const posts=[\n"+safe_post_json+",",1)
    (ROOT/"articles"/f"{slug}.html").write_text(build_html(article,sources),encoding="utf-8")
    loc=f"{BASE}/articles/{slug}.html"
    if loc not in sitemap:
