@@ -83,9 +83,24 @@ sources (مصفوفة من 3 إلى 5 مصادر أصلية موثوقة، لك�
 لا تخترع أرقاماً أو دراسات أو اقتباسات. اعتمد على مصادر رسمية/أكاديمية/معايير معروفة ذات صلة مباشرة، وتجنب الروابط الرئيسية العامة إن أمكن. لا تضع مصادر وهمية. لا تستخدم نصاً تسويقياً ولا تدعِ أن المقال تمت مراجعته بشرياً.
 اكتب بصياغة طبيعية غير مكررة، وابتعد عن النصائح الطبية أو القانونية أو المالية الشخصية.
 """)
- if not isinstance(data.get("sections"), list) or len(data["sections"]) < 5: raise ValueError("Article sections incomplete")
- if len(" ".join(p for sec in data["sections"] for p in sec.get("paragraphs_ar",[])).split()) < 450:
-  raise ValueError("Article is too short")
+ if not isinstance(data.get("sections"), list) or len(data["sections"]) < 5:
+  raise ValueError("Article sections incomplete")
+ word_count = lambda item: len(" ".join(str(p) for sec in item.get("sections",[]) for p in sec.get("paragraphs_ar",[])).split())
+ if word_count(data) < 450:
+  print(f"Generated article is short ({word_count(data)} words); requesting an expansion.")
+  expanded = gemini(f"""
+وسّع المقال التالي دون تغيير موضوعه أو عنوانه أو رابطه أو مصادره.
+المطلوب: نص عربي أصلي لا يقل عن 600 كلمة فعلية، موزع على 6 إلى 8 أقسام واضحة.
+أضف شرحاً عملياً وأمثلة مفيدة وتفاصيل دقيقة، ولا تكرر الأفكار ولا تخترع معلومات أو مصادر.
+احتفظ بنفس مفاتيح JSON وبنية sections و paragraphs_ar. أعد JSON كاملاً فقط.
+المقال الحالي: {json.dumps(data,ensure_ascii=False)}
+""", temperature=0.35)
+  if isinstance(expanded, dict) and isinstance(expanded.get("sections"), list):
+   for key in ("slug","title_ar","title_en","description_ar","description_en","sources","summary_en"):
+    if key not in expanded and key in data: expanded[key] = data[key]
+   data = expanded
+ if word_count(data) < 450:
+  raise ValueError(f"Article is too short after expansion ({word_count(data)} words)")
  slug = re.sub(r"[^a-z0-9-]", "", data.get("slug","").lower()).strip("-")
  if not slug or len(slug) < 8: raise ValueError("Invalid slug")
  data["slug"] = slug
@@ -96,17 +111,31 @@ sources (مصفوفة من 3 إلى 5 مصادر أصلية موثوقة، لك�
  return data
 
 def verify_sources(sources):
- if not isinstance(sources, list) or len(sources) < 3: return False, "Need at least 3 sources"
+ if not isinstance(sources, list) or len(sources) < 3:
+  return False, [], "Need at least 3 candidate sources"
  good=[]
+ failures=[]
+ headers={"User-Agent":"Mozilla/5.0 (compatible; SmartInfoEditorialBot/1.0; +https://smart-info-encyclopedia-site.pages.dev)"}
  for src in sources[:6]:
-  url=src.get("url","")
-  if not url.startswith("https://"): continue
+  if not isinstance(src, dict): continue
+  url=str(src.get("url","")).strip()
+  if not url.startswith("https://"):
+   failures.append("non-HTTPS source")
+   continue
   try:
-   r=requests.get(url, timeout=18, headers={"User-Agent":"SmartInfoEditorialBot/1.0"}, allow_redirects=True, stream=True)
-   if r.status_code < 400: good.append({"title":src.get("title","Source"),"url":r.url})
+   r=requests.get(url, timeout=15, headers=headers, allow_redirects=True, stream=True)
+   status=r.status_code
+   final_url=r.url
    r.close()
-  except requests.RequestException: pass
- return len(good)>=2, good
+   if status < 400 and final_url.startswith("https://"):
+    good.append({"title":str(src.get("title") or "Source"),"url":final_url})
+   else:
+    failures.append(f"{url} returned HTTP {status}")
+  except requests.RequestException as exc:
+   failures.append(f"{url}: {type(exc).__name__}")
+ if len(good) >= 2:
+  return True, good, ""
+ return False, good, f"Only {len(good)} sources could be opened; need 2. " + "; ".join(failures[:3])
 
 def editorial_review(article, sources):
  result=gemini(f"""
@@ -170,8 +199,8 @@ def main():
    slug=article["slug"]
    if slug in slugs or norm(article["title_ar"]) in titles: raise ValueError("Duplicate slug/title")
    if (ROOT/"articles"/f"{slug}.html").exists(): raise ValueError("Article file already exists")
-   ok, sources=verify_sources(article.get("sources",[]))
-   if not ok: raise ValueError("Could not verify at least two source URLs")
+   ok, sources, source_error=verify_sources(article.get("sources",[]))
+   if not ok: raise ValueError(source_error)
    if not editorial_review(article,sources): raise ValueError("Editorial review did not approve")
    # The homepage data model is intentionally bilingual and uses plain text for bodyAr.
    post={"cat":category,"slug":slug,"icon":article["icon"],"ar":article["title_ar"],"en":article.get("title_en",article["title_ar"]),"descAr":article["description_ar"],"descEn":article.get("description_en",article["description_ar"]),"bodyAr":"\n\n".join(sec.get("heading_ar","")+"\n"+"\n".join(sec.get("paragraphs_ar",[])) for sec in article["sections"]),"bodyEn":article.get("summary_en","")}
