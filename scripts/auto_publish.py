@@ -31,7 +31,7 @@ class GeminiQuotaError(RuntimeError):
  pass
 
 _LAST_GEMINI_REQUEST_AT = 0.0
-_GEMINI_MIN_REQUEST_INTERVAL = 5.0
+_GEMINI_MIN_REQUEST_INTERVAL = 8.0
 
 def gemini(prompt, temperature=0.55, grounded_search=False):
  if not API_KEY:
@@ -81,13 +81,13 @@ def gemini(prompt, temperature=0.55, grounded_search=False):
     raise ValueError(f"Gemini returned no text content (finishReason={finish})")
    generated = re.sub(r"^\s*```(?:json)?\s*|\s*```\s*$", "", generated).strip()
    try:
-    parsed = json.loads(generated)
+    parsed = json.loads(generated, strict=False)
    except json.JSONDecodeError:
     start = generated.find("{")
     end = generated.rfind("}")
     if start < 0 or end <= start:
      raise ValueError("Gemini response did not contain a JSON object")
-    parsed = json.loads(generated[start:end + 1])
+    parsed = json.loads(generated[start:end + 1], strict=False)
    if isinstance(parsed, list):
     if len(parsed) == 1 and isinstance(parsed[0], dict):
      parsed = parsed[0]
@@ -114,74 +114,70 @@ def load_existing():
  return index, sitemap, slugs, titles
 
 def make_topic(existing_titles, existing_slugs, used_topics):
- cats = ", ".join(f"{k}: {v[0]}" for k,v in CATEGORIES.items())
- return gemini(f"""
-أنت محرر موسوعة عربية عامة. اقترح موضوع مقال واحد جديد ومحدد ومفيد وغير مكرر.
-التصنيفات المتاحة: {cats}
-عناوين منشورة سابقاً (تجنبها والموضوعات القريبة جداً منها): {list(existing_titles)[:220]}
-الموضوعات المستخدمة في هذه الدفعة: {used_topics}
-أعد JSON فقط بالمفاتيح: topic, category.
-category يجب أن تكون واحداً من: {list(CATEGORIES)}.
-اجعل الموضوع غير حساس وغير طبي/قانوني/استثماري توجيهي، ولا تختر أخباراً أو أسعاراً متغيرة.
-""")
+ # Topic selection is local and consumes no Gemini API request.
+ candidates = [
+  ("كيف تعمل تقنية eSIM وما الذي يميزها عن شرائح الاتصال التقليدية؟", "tech"),
+  ("كيف تحمي حساباتك الرقمية باستخدام مفاتيح المرور Passkeys؟", "apps"),
+  ("ما الفرق بين التخزين السحابي والنسخ الاحتياطي؟", "tech"),
+  ("كيف تقرأ ملصق كفاءة الطاقة على الأجهزة المنزلية؟", "life"),
+  ("كيف تعمل أنظمة الملاحة عبر الأقمار الصناعية؟", "science"),
+  ("ما الذي يجب فحصه قبل شراء سيارة مستعملة؟", "cars"),
+  ("كيف تخطط لرحلة متعددة الوجهات بميزانية واضحة؟", "travel"),
+  ("كيف تميز بين سعر الفائدة السنوي ومعدل النسبة السنوي؟", "money"),
+  ("كيف تنظّم كلمات المرور بأمان دون إعادة استخدامها؟", "apps"),
+  ("كيف تعمل البطاريات القابلة لإعادة الشحن؟", "science"),
+  ("ما الفرق بين Wi-Fi 6 وWi-Fi 7؟", "tech"),
+  ("كيف تقلل استهلاك الوقود أثناء القيادة؟", "cars"),
+ ]
+ used={norm(x) for x in used_topics}
+ for topic, category in candidates:
+  if norm(topic) not in existing_titles and norm(topic) not in used:
+   return {"topic":topic,"category":category}
+ raise RuntimeError("No unused topic remains in the built-in topic list; add new topics before publishing.")
+
 
 def generate_article(topic, category):
  cat_ar, cat_en, icon = CATEGORIES[category]
  data = gemini(f"""
-اكتب مقالاً تعليمياً أصلياً ومفيداً لموسوعة المعلومة الذكية باللغة العربية أولاً، مع نسخة إنجليزية موجزة دقيقة.
+اكتب مقالاً تعليمياً أصلياً لموسوعة المعلومة الذكية باللغة العربية أولاً، مع نسخة إنجليزية موجزة.
+استخدم بحث Google المدمج للعثور على مصادر منشورة فعلية قبل كتابة المقال، واستند إلى نتائج البحث.
 الموضوع: {topic}
 التصنيف: {cat_ar}
-أعد JSON فقط بالمفاتيح التالية:
-slug (إنجليزي kebab-case قصير، 3-7 كلمات، فريد)،
-title_ar (عنوان عربي واضح)، title_en،
-description_ar (وصف 120-160 حرفاً تقريباً)، description_en،
-sections (مصفوفة من 5 إلى 8 عناصر، لكل عنصر heading_ar و paragraphs_ar كمصفوفة من 1-3 فقرات)،
-summary_en (فقرتان موجزتان باللغة الإنجليزية)،
-sources (مصفوفة من 3 إلى 5 مصادر أصلية موثوقة، لكل مصدر title و url).
-المقال العربي يجب أن يكون بين 700 و1000 كلمة فعلية، ولا يقل مطلقاً عن 600 كلمة. اكتب 6 إلى 8 أقسام، وفي كل قسم فقرتان شارحتان على الأقل، مع مقدمة وخطوات أو أمثلة وأسئلة شائعة عند ملاءمة الموضوع.
-خصص مساحة كافية للشرح ولا تختصر الإجابة في تعريفات عامة. لا تخترع أرقاماً أو دراسات أو اقتباسات. اعتمد على 5 مصادر رسمية/أكاديمية/معايير معروفة ذات صلة مباشرة، بروابط صفحات محددة لا صفحات رئيسية عامة. لا تضع روابط تتوقع أنها غير موجودة ولا تكرر النطاق نفسه أكثر من مرتين. لا تستخدم نصاً تسويقياً ولا تدعِ أن المقال تمت مراجعته بشرياً.
-اكتب بصياغة طبيعية غير مكررة، وابتعد عن النصائح الطبية أو القانونية أو المالية الشخصية.
-""")
+أعد كائن JSON واحداً فقط بالمفاتيح:
+slug (إنجليزي kebab-case من 3 إلى 7 كلمات)، title_ar، title_en، description_ar، description_en،
+sections (6 إلى 8 عناصر، لكل عنصر heading_ar و paragraphs_ar من فقرتين إلى 3 فقرات)،
+summary_en (فقرتان)، sources (3 إلى 5 عناصر، لكل عنصر title و url).
+اكتب 600 إلى 850 كلمة عربية فعلية. لا تختصر. اجعل كل قسم مفيداً ومختلفاً عن الآخر.
+المصادر يجب أن تكون صفحات محددة وجديرة بالثقة، ويفضل جهات حكومية أو جامعات أو منظمات معيارية. استخدم الروابط التي ظهرت في نتائج البحث فقط، ولا تخترع أي رابط.
+لا تخترع أرقاماً أو دراسات أو اقتباسات. لا تكتب نصائح طبية أو قانونية أو مالية شخصية. لا تضع أي نص خارج JSON.
+""", temperature=0.25, grounded_search=True)
  def count_words(item):
   return len(" ".join(str(p) for sec in item.get("sections",[]) if isinstance(sec,dict) for p in (sec.get("paragraphs_ar",[]) if isinstance(sec.get("paragraphs_ar",[]),list) else [])).split())
+ if not isinstance(data.get("sections"), list) or not 6 <= len(data["sections"]) <= 8:
+  raise ValueError("Article must contain 6 to 8 sections")
  if count_words(data) < 600:
-  print(f"Generated article is short ({count_words(data)} words); requesting an expansion.")
-  expanded = gemini(f"""
-وسّع المقال التالي دون تغيير موضوعه أو عنوانه أو رابطه أو مصادره.
-المطلوب: نص عربي أصلي لا يقل عن 700 كلمة فعلية، موزع على 6 إلى 8 أقسام واضحة. أعد كائن JSON واحداً فقط وليس مصفوفة، ولا تضع أي شرح خارج JSON.
-أضف شرحاً عملياً وأمثلة مفيدة وتفاصيل دقيقة، ولا تكرر الأفكار ولا تخترع معلومات أو مصادر.
-احتفظ بنفس مفاتيح JSON وبنية sections و paragraphs_ar. أعد JSON كاملاً فقط.
-المقال الحالي: {json.dumps(data,ensure_ascii=False)}
-""", temperature=0.35)
-  if isinstance(expanded, dict) and isinstance(expanded.get("sections"), list):
-   for key in ("slug","title_ar","title_en","description_ar","description_en","sources","summary_en"):
-    if key not in expanded and key in data: expanded[key] = data[key]
-   data = expanded
- if not isinstance(data.get("sections"), list) or not 5 <= len(data["sections"]) <= 8:
-  raise ValueError("Article must contain 5 to 8 sections")
- if count_words(data) < 600:
-  raise ValueError(f"Article is too short after expansion ({count_words(data)} words; minimum 600)")
+  raise ValueError(f"Article is too short ({count_words(data)} words; minimum 600). No expansion call was made.")
  for sec in data["sections"]:
   if not isinstance(sec,dict) or not str(sec.get("heading_ar","")).strip():
    raise ValueError("Article section is missing its heading")
   paragraphs=sec.get("paragraphs_ar")
-  if not isinstance(paragraphs,list) or not paragraphs or any(not isinstance(p,str) or len(p.strip()) < 40 for p in paragraphs):
+  if not isinstance(paragraphs,list) or len(paragraphs)<2 or any(not isinstance(p,str) or len(p.strip())<80 for p in paragraphs):
    raise ValueError("Article section has missing or very short paragraphs")
  for field in ("title_ar","title_en","description_ar","description_en"):
   if not isinstance(data.get(field),str) or not data[field].strip():
    raise ValueError(f"Missing required article field: {field}")
  if not 70 <= len(data["description_ar"]) <= 200:
   raise ValueError("Arabic description length must be between 70 and 200 characters")
- slug = data.get("slug","")
+ slug=data.get("slug","")
  if not isinstance(slug,str) or not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+){2,6}",slug.lower()):
   raise ValueError("Invalid slug; expected 3 to 7 lowercase English words")
- slug = slug.lower()
- data["slug"] = slug
- data["category"] = category
- data["icon"] = icon
- data["category_ar"] = cat_ar
- data["category_en"] = cat_en
+ data["slug"]=slug.lower()
+ data["category"]=category
+ data["icon"]=icon
+ data["category_ar"]=cat_ar
+ data["category_en"]=cat_en
  return data
+
 
 def is_public_https_url(url):
  try:
@@ -243,78 +239,23 @@ def verify_sources(sources):
   return True, good[:5], ""
  return False, good, f"Only {len(good)} sources could be opened; need at least 3. " + "; ".join(failures[:3])
 
-def repair_sources(article, source_error):
- failed = article.get("sources", [])
- for attempt in range(3):
-  replacement = gemini(f"""
-أنت مساعد بحث للمراجع. استخدم بحث Google المدمج للعثور على صفحات منشورة فعلاً، ولا تعتمد على الذاكرة أو تخمين الروابط.
-نحتاج خمسة مصادر بديلة حقيقية ومباشرة لمقال موسوعي عربي.
-الموضوع: {article.get("title_ar")}
-ملخص المقال: {json.dumps(article.get("sections", [])[:3], ensure_ascii=False)[:3500]}
-روابط سبق اقتراحها ولا نريد تكرارها: {json.dumps(failed, ensure_ascii=False)}
-نتيجة فحص الروابط: {source_error}
-في هذه المحاولة رقم {attempt + 1}: اقترح خمسة روابط مختلفة تماماً قدر الإمكان، من صفحات محددة في مواقع حكومية أو جامعات أو منظمات معيارية معروفة، وتأكد من كتابة المسار الكامل للصفحة لا اسم النطاق فقط.
-لا تستخدم أي رابط من القائمة السابقة ولا تخترع عناوين أو مسارات تخمينية. إذا لم تكن واثقاً من وجود الرابط فلا تضعه.
-أعد JSON فقط بالشكل: {{"sources":[{{"title":"اسم الصفحة","url":"https://..."}}]}}
-""", temperature=0.7, grounded_search=True)
-  proposed = replacement.get("sources", []) if isinstance(replacement, dict) else []
-  if proposed:
-   ok, checked, err = verify_sources(proposed)
-   if ok:
-    return checked
-   source_error = err
-   failed.extend(proposed)
- return []
-
 def editorial_review(article, sources):
- for round_no in range(3):
-  result=gemini(f"""
-أنت مراجع تحريري مستقل. قيّم المقال التالي قبل النشر.
-تحقق من: الدقة العامة، وضوح الشرح، التكرار، سلامة اللغة، العنوان والوصف، وعدم وجود ادعاءات رقمية/علمية غير مسندة أو نصائح عالية المخاطر.
-روابط المصادر التي أمكن فتحها فعلياً: {json.dumps(sources,ensure_ascii=False)}
+ result=gemini(f"""
+أنت مراجع تحريري مستقل. افحص المقال قبل النشر من حيث الدقة، وضوح الشرح، التكرار، اللغة، سلامة المصادر، وعدم وجود ادعاءات غير مسندة أو نصائح عالية المخاطر.
+المصادر التي تم فتحها والتحقق من استجابتها: {json.dumps(sources,ensure_ascii=False)}
 المقال: {json.dumps(article,ensure_ascii=False)}
-أعد JSON فقط: approved (true/false), score (0-100), reasons (مصفوفة قصيرة), corrections (مصفوفة تعديلات محددة).
-إذا وجدت تعديلات لغوية أو تنظيمية أو توضيحات ضرورية، اذكرها بوضوح في corrections ولا تكتفِ برفض المقال. لا توافق لمجرد أن النص منظم.
+أعد JSON فقط بالمفاتيح: approved (true/false), score (0-100), reasons (مصفوفة).
+وافق فقط إذا كان المقال صالحاً للنشر دون تعديلات جوهرية، والدرجة 90 على الأقل. لا تطلب تحسينات شكلية اختيارية.
 """, temperature=0.1)
-  try:
-   score = int(result.get("score",0))
-  except (TypeError, ValueError):
-   score = 0
-  corrections = result.get("corrections", [])
-  reasons = result.get("reasons", [])
-  if not isinstance(corrections,list) or not isinstance(reasons,list):
-   print("Rejected: invalid editorial review format:", result)
-   return False
-  if result.get("approved") is True and score >= 90 and not corrections:
-   return True
-  if round_no == 2 or not corrections:
-   print("Rejected by editorial review:", result)
-   return False
-  print(f"Applying editorial corrections and requesting review round {round_no + 2}/3.")
-  revised=gemini(f"""
-أنت محرر عربي. نفّذ التعديلات المحددة أدناه على المقال، ثم أعد المقال كاملاً ككائن JSON فقط.
-التعديلات المطلوبة من المراجع: {json.dumps(corrections,ensure_ascii=False)}
-حافظ على الموضوع والعنوان والرابط والمصادر والتصنيف، ولا تضف ادعاءات أو أرقاماً أو مراجع جديدة.
-حافظ على 5 إلى 8 أقسام، وعلى 600 كلمة عربية على الأقل، وعلى مفاتيح JSON وبنية الأقسام الأصلية.
-المقال الحالي: {json.dumps(article,ensure_ascii=False)}
-""", temperature=0.2)
-  if not isinstance(revised,dict):
-   print("Editorial correction response was not a JSON object.")
-   return False
-  for key in ("slug","title_ar","title_en","description_ar","description_en","sources","summary_en","category","icon","category_ar","category_en"):
-   if key not in revised and key in article:
-    revised[key]=article[key]
-  sections=revised.get("sections")
-  if not isinstance(sections,list) or not 5 <= len(sections) <= 8:
-   print("Editorial correction produced invalid section count.")
-   return False
-  word_count=len(" ".join(str(p) for sec in sections if isinstance(sec,dict) for p in (sec.get("paragraphs_ar",[]) if isinstance(sec.get("paragraphs_ar",[]),list) else [])).split())
-  if word_count < 600:
-   print(f"Editorial correction left article too short ({word_count} words).")
-   return False
-  article.clear()
-  article.update(revised)
- return False
+ try:
+  score=int(result.get("score",0))
+ except (TypeError,ValueError):
+  score=0
+ reasons=result.get("reasons",[])
+ approved=result.get("approved") is True and score>=90 and isinstance(reasons,list)
+ print(f"Editorial review: approved={approved}, score={score}, reasons={reasons}")
+ return approved
+
 
 def build_html(a, sources):
  title=html.escape(a["title_ar"])
@@ -426,9 +367,8 @@ def main():
    if (ROOT/"articles"/f"{slug}.html").exists(): raise ValueError("Article file already exists")
    ok, sources, source_error=verify_sources(article.get("sources",[]))
    if not ok:
-    print("Repairing source links:", source_error)
-    sources = repair_sources(article, source_error)
-   if len(sources) < 3: raise ValueError(f"Could not verify 3 reliable sources: {source_error}")
+    raise ValueError(f"Could not verify 3 sources; no extra repair calls were made: {source_error}")
+   if len(sources) < 3: raise ValueError("Fewer than 3 verified sources")
    if not editorial_review(article,sources): raise ValueError("Editorial review did not approve")
    # The homepage data model is intentionally bilingual and uses plain text for bodyAr.
    post={"cat":category,"slug":slug,"icon":article["icon"],"ar":article["title_ar"],"en":article.get("title_en",article["title_ar"]),"descAr":article["description_ar"],"descEn":article.get("description_en",article["description_ar"]),"bodyAr":"\n\n".join(sec.get("heading_ar","")+"\n"+"\n".join(sec.get("paragraphs_ar",[])) for sec in article["sections"]),"bodyEn":article.get("summary_en","")}
