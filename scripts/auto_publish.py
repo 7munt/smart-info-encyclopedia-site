@@ -128,6 +128,30 @@ def make_topic(existing_titles, existing_slugs, used_topics):
   ("كيف تعمل البطاريات القابلة لإعادة الشحن؟", "science"),
   ("ما الفرق بين Wi-Fi 6 وWi-Fi 7؟", "tech"),
   ("كيف تقلل استهلاك الوقود أثناء القيادة؟", "cars"),
+  ("كيف تختار جهاز راوتر مناسباً للمنزل؟", "tech"),
+  ("ما خطوات حماية الهاتف عند فقدانه أو سرقته؟", "apps"),
+  ("كيف تقارن بين الشاشات من حيث الدقة ومعدل التحديث؟", "tech"),
+  ("كيف تعمل الألواح الشمسية وتحوّل ضوء الشمس إلى كهرباء؟", "science"),
+  ("كيف تختار الثلاجة وفق السعة واستهلاك الطاقة؟", "life"),
+  ("ما الفرق بين تأجير السيارة اليومي والشهري؟", "travel"),
+  ("كيف تجهز حقيبة سفر خفيفة ومنظمة؟", "travel"),
+  ("كيف تقرأ تقرير فحص السيارة قبل الشراء؟", "cars"),
+  ("كيف تعمل تقنية الدفع اللاتلامسي NFC؟", "tech"),
+  ("ما أفضل الممارسات لحماية شبكة Wi-Fi المنزلية؟", "apps"),
+  ("كيف تنشئ ميزانية شهرية وتتبع المصروفات؟", "money"),
+  ("ما الفرق بين الادخار والاستثمار وإدارة المخاطر؟", "money"),
+  ("كيف تختار مرتبة نوم مناسبة لاحتياجاتك؟", "life"),
+  ("كيف تتعامل مع ارتفاع حرارة محرك السيارة؟", "cars"),
+  ("كيف تعمل الطباعة ثلاثية الأبعاد واستخداماتها؟", "science"),
+  ("كيف تتحقق من موثوقية متجر إلكتروني قبل الشراء؟", "apps"),
+  ("ما الفرق بين أنواع منافذ USB وسرعاتها؟", "tech"),
+  ("كيف تخطط لصيانة منزلية دورية وتقلل الأعطال؟", "life"),
+  ("كيف تختار تأمين السفر وتفهم التغطيات الأساسية؟", "travel"),
+  ("ما العوامل التي تؤثر في مدى السيارات الكهربائية؟", "cars"),
+  ("كيف تقارن بين باقات الإنترنت المنزلي؟", "tech"),
+  ("كيف تكتشف الرسائل الاحتيالية وروابط التصيد؟", "apps"),
+  ("كيف تعمل الأقمار الصناعية الخاصة بالطقس؟", "science"),
+  ("كيف تحافظ على الأجهزة المنزلية وتطيل عمرها؟", "life")
  ]
  used={norm(x) for x in used_topics}
  for topic, category in candidates:
@@ -346,13 +370,13 @@ def main():
  raw_count = str(os.getenv("ARTICLE_COUNT","3") or "3").strip()
  count_match = re.search(r"\d+", raw_count)
  if not count_match:
-  raise SystemExit(f"Invalid ARTICLE_COUNT value: {raw_count!r}. Use 1, 2, or 3.")
- count = max(1, min(3, int(count_match.group(0))))
+  raise SystemExit(f"Invalid ARTICLE_COUNT value: {raw_count!r}. Use 1 through 10.")
+ count = max(1, min(10, int(count_match.group(0))))
  if raw_count != count_match.group(0):
   print(f"ARTICLE_COUNT input {raw_count!r} normalized to {count}.")
  used=[]
  published=0
- max_attempts = min(12, count * 4)
+ max_attempts = min(40, count * 4)
  for n in range(max_attempts):
   if published >= count:
    break
@@ -361,6 +385,7 @@ def main():
    topic=str(topic_data.get("topic","")).strip()
    category=topic_data.get("category")
    if not topic or category not in CATEGORIES: raise ValueError("Invalid topic/category")
+   used.append(topic)
    article=generate_article(topic,category)
    slug=article["slug"]
    if slug in slugs or norm(article["title_ar"]) in titles: raise ValueError("Duplicate slug/title")
@@ -379,7 +404,7 @@ def main():
    if loc not in sitemap:
     entry=f'  <url><loc>{loc}</loc><lastmod>{TODAY}</lastmod></url>\n'
     sitemap=sitemap.replace("</urlset>",entry+"</urlset>")
-   slugs.add(slug); titles.add(norm(article["title_ar"])); used.append(topic); published+=1
+   slugs.add(slug); titles.add(norm(article["title_ar"])); published+=1
    print(f"Published candidate {published}: {slug}")
   except GeminiQuotaError as exc:
    print(f"STOPPING: {exc}")
