@@ -30,6 +30,9 @@ def norm(s):
 class GeminiQuotaError(RuntimeError):
  pass
 
+_LAST_GEMINI_REQUEST_AT = 0.0
+_GEMINI_MIN_REQUEST_INTERVAL = 5.0
+
 def gemini(prompt, temperature=0.55, grounded_search=False):
  if not API_KEY:
   raise RuntimeError("Missing GEMINI_API_KEY repository secret")
@@ -41,16 +44,30 @@ def gemini(prompt, temperature=0.55, grounded_search=False):
  last = None
  for attempt in range(5):
   try:
+   global _LAST_GEMINI_REQUEST_AT
+   elapsed = time.monotonic() - _LAST_GEMINI_REQUEST_AT
+   if elapsed < _GEMINI_MIN_REQUEST_INTERVAL:
+    time.sleep(_GEMINI_MIN_REQUEST_INTERVAL - elapsed)
    r = requests.post(API, headers={"x-goog-api-key": API_KEY}, json=payload, timeout=120)
-   if r.status_code == 429 and ("exceeded your current quota" in r.text.lower() or "resource_exhausted" in r.text.lower()):
-    raise GeminiQuotaError("Gemini API quota/billing limit reached. Check Google AI Studio usage and billing before retrying.")
-   if r.status_code in (429, 500, 502, 503, 504):
-    last = f"Gemini HTTP {r.status_code}: {r.text[:300]}"
+   _LAST_GEMINI_REQUEST_AT = time.monotonic()
+   if r.status_code == 429:
+    last = f"Gemini HTTP 429: {r.text[:300]}"
     retry_after = r.headers.get("Retry-After", "")
     try:
-     delay = min(45, max(5, int(retry_after)))
+     delay = min(90, max(60, int(retry_after)))
     except (TypeError, ValueError):
-     delay = min(40, 5 * (2 ** attempt))
+     delay = 60
+    if "exceeded your current quota" in r.text.lower() or "resource_exhausted" in r.text.lower():
+     print("Gemini returned HTTP 429. Waiting 60 seconds before one controlled retry; if quota remains exhausted, the run will stop.")
+    else:
+     print(f"Gemini rate limit reached; retry {attempt + 1}/5 in {delay}s.")
+    if attempt >= 1 and ("exceeded your current quota" in r.text.lower() or "resource_exhausted" in r.text.lower()):
+     raise GeminiQuotaError("Gemini API returned 429 repeatedly. Check the free-tier RPM limit and project quota in AI Studio.")
+    time.sleep(delay)
+    continue
+   if r.status_code in (500, 502, 503, 504):
+    last = f"Gemini HTTP {r.status_code}: {r.text[:300]}"
+    delay = min(40, 5 * (2 ** attempt))
     print(f"Gemini temporarily unavailable (HTTP {r.status_code}); retry {attempt + 1}/5 in {delay}s.")
     time.sleep(delay)
     continue
