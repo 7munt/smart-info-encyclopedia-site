@@ -179,6 +179,15 @@ def build_html(a, sources):
  return f'''<!doctype html>
 <html lang="ar" dir="rtl"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KQ2NGJXXKC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-KQ2NGJXXKC');
+</script>
+
 <title>{title} | المعلومة الذكية</title><meta name="description" content="{desc}">
 <link rel="canonical" href="{canonical}"><meta name="robots" content="index,follow,max-image-preview:large">
 <meta property="og:type" content="article"><meta property="og:title" content="{title} | المعلومة الذكية"><meta property="og:description" content="{desc}"><meta property="og:url" content="{canonical}">
