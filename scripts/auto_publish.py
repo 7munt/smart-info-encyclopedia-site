@@ -84,14 +84,13 @@ sources (مصفوفة من 3 إلى 5 مصادر أصلية موثوقة، لك�
 لا تخترع أرقاماً أو دراسات أو اقتباسات. اعتمد على مصادر رسمية/أكاديمية/معايير معروفة ذات صلة مباشرة، وتجنب الروابط الرئيسية العامة إن أمكن. لا تضع مصادر وهمية. لا تستخدم نصاً تسويقياً ولا تدعِ أن المقال تمت مراجعته بشرياً.
 اكتب بصياغة طبيعية غير مكررة، وابتعد عن النصائح الطبية أو القانونية أو المالية الشخصية.
 """)
- if not isinstance(data.get("sections"), list) or len(data["sections"]) < 5:
-  raise ValueError("Article sections incomplete")
- word_count = lambda item: len(" ".join(str(p) for sec in item.get("sections",[]) for p in sec.get("paragraphs_ar",[])).split())
- if word_count(data) < 450:
-  print(f"Generated article is short ({word_count(data)} words); requesting an expansion.")
+ def count_words(item):
+  return len(" ".join(str(p) for sec in item.get("sections",[]) if isinstance(sec,dict) for p in (sec.get("paragraphs_ar",[]) if isinstance(sec.get("paragraphs_ar",[]),list) else [])).split())
+ if count_words(data) < 500:
+  print(f"Generated article is short ({count_words(data)} words); requesting an expansion.")
   expanded = gemini(f"""
 وسّع المقال التالي دون تغيير موضوعه أو عنوانه أو رابطه أو مصادره.
-المطلوب: نص عربي أصلي لا يقل عن 600 كلمة فعلية، موزع على 6 إلى 8 أقسام واضحة.
+المطلوب: نص عربي أصلي لا يقل عن 650 كلمة فعلية، موزع على 6 إلى 8 أقسام واضحة.
 أضف شرحاً عملياً وأمثلة مفيدة وتفاصيل دقيقة، ولا تكرر الأفكار ولا تخترع معلومات أو مصادر.
 احتفظ بنفس مفاتيح JSON وبنية sections و paragraphs_ar. أعد JSON كاملاً فقط.
 المقال الحالي: {json.dumps(data,ensure_ascii=False)}
@@ -100,10 +99,25 @@ sources (مصفوفة من 3 إلى 5 مصادر أصلية موثوقة، لك�
    for key in ("slug","title_ar","title_en","description_ar","description_en","sources","summary_en"):
     if key not in expanded and key in data: expanded[key] = data[key]
    data = expanded
- if word_count(data) < 450:
-  raise ValueError(f"Article is too short after expansion ({word_count(data)} words)")
- slug = re.sub(r"[^a-z0-9-]", "", data.get("slug","").lower()).strip("-")
- if not slug or len(slug) < 8: raise ValueError("Invalid slug")
+ if not isinstance(data.get("sections"), list) or not 5 <= len(data["sections"]) <= 8:
+  raise ValueError("Article must contain 5 to 8 sections")
+ if count_words(data) < 500:
+  raise ValueError(f"Article is too short after expansion ({count_words(data)} words; minimum 500)")
+ for sec in data["sections"]:
+  if not isinstance(sec,dict) or not str(sec.get("heading_ar","")).strip():
+   raise ValueError("Article section is missing its heading")
+  paragraphs=sec.get("paragraphs_ar")
+  if not isinstance(paragraphs,list) or not paragraphs or any(not isinstance(p,str) or len(p.strip()) < 40 for p in paragraphs):
+   raise ValueError("Article section has missing or very short paragraphs")
+ for field in ("title_ar","title_en","description_ar","description_en"):
+  if not isinstance(data.get(field),str) or not data[field].strip():
+   raise ValueError(f"Missing required article field: {field}")
+ if not 70 <= len(data["description_ar"]) <= 200:
+  raise ValueError("Arabic description length must be between 70 and 200 characters")
+ slug = data.get("slug","")
+ if not isinstance(slug,str) or not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+){2,6}",slug.lower()):
+  raise ValueError("Invalid slug; expected 3 to 7 lowercase English words")
+ slug = slug.lower()
  data["slug"] = slug
  data["category"] = category
  data["icon"] = icon
@@ -167,9 +181,9 @@ def verify_sources(sources):
    if response is not None:
     response.close()
    failures.append(f"{url}: {type(exc).__name__}")
- if len(good) >= 2:
-  return True, good, ""
- return False, good, f"Only {len(good)} sources could be opened; need 2. " + "; ".join(failures[:3])
+ if len(good) >= 3:
+  return True, good[:5], ""
+ return False, good, f"Only {len(good)} sources could be opened; need at least 3. " + "; ".join(failures[:3])
 
 def repair_sources(article, source_error):
  replacement = gemini(f"""
@@ -191,7 +205,15 @@ def editorial_review(article, sources):
 أعد JSON فقط: approved (true/false), score (0-100), reasons (مصفوفة قصيرة), corrections (مصفوفة تعديلات نصية ضرورية).
 ارفض إذا كان المحتوى يتضمن ادعاءات رئيسية غير موثوقة، أو إذا كانت المصادر لا تدعم الموضوع، أو المقال ضعيف/قصير/مكرر. لا توافق لمجرد أن النص منظم.
 """, temperature=0.1)
- if result.get("approved") is not True or int(result.get("score",0)) < 85:
+ try:
+  score = int(result.get("score",0))
+ except (TypeError, ValueError):
+  score = 0
+ corrections = result.get("corrections", [])
+ reasons = result.get("reasons", [])
+ if (result.get("approved") is not True or score < 90
+     or not isinstance(corrections,list) or len(corrections) > 0
+     or not isinstance(reasons,list)):
   print("Rejected by editorial review:", result)
   return False
  return True
