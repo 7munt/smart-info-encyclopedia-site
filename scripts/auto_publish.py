@@ -33,7 +33,7 @@ def gemini(prompt, temperature=0.55):
             "generationConfig":{"temperature":temperature,"responseMimeType":"application/json"}}
  last = None
  for attempt in range(4):
-  r = requests.post(API, params={"key":API_KEY}, json=payload, timeout=120)
+  r = requests.post(API, headers={"x-goog-api-key": API_KEY}, json=payload, timeout=120)
   if r.status_code in (429, 500, 502, 503):
    last = f"Gemini HTTP {r.status_code}: {r.text[:500]}"
    time.sleep(8 * (attempt + 1)); continue
