@@ -32,11 +32,11 @@ def gemini(prompt, temperature=0.55):
  payload = {"contents":[{"role":"user","parts":[{"text":prompt}]}],
             "generationConfig":{"temperature":temperature,"responseMimeType":"application/json"}}
  last = None
- for attempt in range(4):
+ for attempt in range(6):
   r = requests.post(API, headers={"x-goog-api-key": API_KEY}, json=payload, timeout=120)
   if r.status_code in (429, 500, 502, 503):
    last = f"Gemini HTTP {r.status_code}: {r.text[:500]}"
-   time.sleep(8 * (attempt + 1)); continue
+   time.sleep(15 * (attempt + 1)); continue
   r.raise_for_status()
   data = r.json()
   text = data["candidates"][0]["content"]["parts"][0]["text"]
@@ -79,12 +79,12 @@ description_ar (وصف 120-160 حرفاً تقريباً)، description_en،
 sections (مصفوفة من 5 إلى 8 عناصر، لكل عنصر heading_ar و paragraphs_ar كمصفوفة من 1-3 فقرات)،
 summary_en (فقرتان موجزتان باللغة الإنجليزية)،
 sources (مصفوفة من 3 إلى 5 مصادر أصلية موثوقة، لكل مصدر title و url).
-المقال العربي يجب أن يتجاوز 900 كلمة، يتضمن مقدمة وعناوين فرعية وخطوات أو أمثلة وأسئلة شائعة عند ملاءمة الموضوع.
+المقال العربي يجب أن يكون بين 650 و1000 كلمة قدر الإمكان، ولا يقل عن 500 كلمة، يتضمن مقدمة وعناوين فرعية وخطوات أو أمثلة وأسئلة شائعة عند ملاءمة الموضوع.
 لا تخترع أرقاماً أو دراسات أو اقتباسات. اعتمد على مصادر رسمية/أكاديمية/معايير معروفة ذات صلة مباشرة، وتجنب الروابط الرئيسية العامة إن أمكن. لا تضع مصادر وهمية. لا تستخدم نصاً تسويقياً ولا تدعِ أن المقال تمت مراجعته بشرياً.
 اكتب بصياغة طبيعية غير مكررة، وابتعد عن النصائح الطبية أو القانونية أو المالية الشخصية.
 """)
  if not isinstance(data.get("sections"), list) or len(data["sections"]) < 5: raise ValueError("Article sections incomplete")
- if len(" ".join(p for sec in data["sections"] for p in sec.get("paragraphs_ar",[])).split()) < 650:
+ if len(" ".join(p for sec in data["sections"] for p in sec.get("paragraphs_ar",[])).split()) < 450:
   raise ValueError("Article is too short")
  slug = re.sub(r"[^a-z0-9-]", "", data.get("slug","").lower()).strip("-")
  if not slug or len(slug) < 8: raise ValueError("Invalid slug")
