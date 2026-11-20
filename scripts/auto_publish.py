@@ -106,11 +106,11 @@ sources (مصفوفة من 3 إلى 5 مصادر أصلية موثوقة، لك�
 """)
  def count_words(item):
   return len(" ".join(str(p) for sec in item.get("sections",[]) if isinstance(sec,dict) for p in (sec.get("paragraphs_ar",[]) if isinstance(sec.get("paragraphs_ar",[]),list) else [])).split())
- if count_words(data) < 500:
+ if count_words(data) < 600:
   print(f"Generated article is short ({count_words(data)} words); requesting an expansion.")
   expanded = gemini(f"""
 وسّع المقال التالي دون تغيير موضوعه أو عنوانه أو رابطه أو مصادره.
-المطلوب: نص عربي أصلي لا يقل عن 650 كلمة فعلية، موزع على 6 إلى 8 أقسام واضحة.
+المطلوب: نص عربي أصلي لا يقل عن 700 كلمة فعلية، موزع على 6 إلى 8 أقسام واضحة.
 أضف شرحاً عملياً وأمثلة مفيدة وتفاصيل دقيقة، ولا تكرر الأفكار ولا تخترع معلومات أو مصادر.
 احتفظ بنفس مفاتيح JSON وبنية sections و paragraphs_ar. أعد JSON كاملاً فقط.
 المقال الحالي: {json.dumps(data,ensure_ascii=False)}
@@ -121,8 +121,8 @@ sources (مصفوفة من 3 إلى 5 مصادر أصلية موثوقة، لك�
    data = expanded
  if not isinstance(data.get("sections"), list) or not 5 <= len(data["sections"]) <= 8:
   raise ValueError("Article must contain 5 to 8 sections")
- if count_words(data) < 500:
-  raise ValueError(f"Article is too short after expansion ({count_words(data)} words; minimum 500)")
+ if count_words(data) < 600:
+  raise ValueError(f"Article is too short after expansion ({count_words(data)} words; minimum 600)")
  for sec in data["sections"]:
   if not isinstance(sec,dict) or not str(sec.get("heading_ar","")).strip():
    raise ValueError("Article section is missing its heading")
