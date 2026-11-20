@@ -359,6 +359,65 @@ body{background:var(--paper)!important;color:var(--text)!important;font-family:T
 @media(max-width:950px){.hero-layout{grid-template-columns:1fr .8fr;gap:24px}.hero h1{font-size:56px!important}.hero-visual{min-height:300px}.cats{grid-template-columns:repeat(2,minmax(0,1fr))!important}.articles{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:650px){.wrap,.nav{width:calc(100% - 32px)!important}.nav{height:68px!important}.brand{font-size:15px!important}.mark{width:42px!important;height:42px!important}.brand small{font-size:7px!important}.navlinks{display:none!important}.hero{padding:44px 0 40px!important;min-height:0}.hero-layout{grid-template-columns:1fr;gap:24px;min-height:0}.hero-copy{max-width:none}.hero h1{font-size:47px!important;margin:20px 0 13px!important}.hero p{font-size:15px!important;margin-bottom:22px!important}.hero-visual{min-height:220px}.visual-book{width:210px}.orbit-a{width:280px;height:145px}.orbit-b{width:245px;height:210px}.note-one{top:15px;inset-inline-start:0}.note-two{bottom:22px;inset-inline-end:0}.visual-caption{bottom:-3px}.quick-search{gap:6px}.quick-search button{font-size:10px!important;padding:6px 10px!important}#categories{padding:27px 0 8px!important}.cats{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}.cat{min-height:72px;padding:10px!important}.cat .ico{width:40px!important;height:40px!important}.search-results-inline{padding:25px 0 36px!important}.search-results-inline .section-head h2{font-size:22px!important}.articles{grid-template-columns:1fr!important;gap:14px!important}.thumb{height:145px!important}.trust-strip{gap:16px!important;padding:22px 16px!important}.trust-item{min-width:40%}.section{padding:28px 0!important}}
 
+
+/* 3D icon system — depth, bevel, highlights and soft shadows */
+.ico,.trust-icon,.mark,.thumb-symbol,.hero-emblem,.visual-book,.search button{
+  position:relative;isolation:isolate;transform-style:preserve-3d;
+  transition:transform .28s cubic-bezier(.2,.8,.2,1),box-shadow .28s,filter .28s;
+}
+.ico{
+  overflow:visible!important;
+  border:1px solid #d6e1fb!important;
+  background:linear-gradient(145deg,#ffffff 0%,#e8efff 52%,#cbd9fb 100%)!important;
+  box-shadow:inset 0 2px 2px #ffffff, inset 0 -4px 8px #829bd533, 0 5px 0 #aebfe6, 0 9px 16px #294c9b25!important;
+  text-shadow:0 2px 1px #ffffff,0 5px 8px #23468b33;
+  transform:perspective(500px) rotateX(9deg) translateZ(8px);
+  font-size:28px!important;
+}
+.ico:before{
+  content:"";position:absolute;inset:5px;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(135deg,#ffffffa8,transparent 48%,#6688d51c);
+  transform:translateZ(2px);
+}
+.ico svg{filter:drop-shadow(0 3px 2px #3159a955);transform:translateZ(10px)}
+.cat{perspective:700px}
+.cat:hover .ico,.cat.active .ico{transform:perspective(500px) rotateX(0deg) rotateY(-8deg) translateY(-5px) translateZ(16px);box-shadow:inset 0 2px 2px #fff,inset 0 -4px 8px #829bd533,0 8px 0 #9aafe0,0 16px 25px #294c9b38!important}
+.cat:nth-child(2n) .ico{background:linear-gradient(145deg,#fff,#dff8ed 60%,#b9e8d4)!important;box-shadow:inset 0 2px 2px #fff,inset 0 -4px 8px #6abf9633,0 5px 0 #a7d9c1,0 9px 16px #22885a24!important;color:#15965e!important}
+.cat:nth-child(3n) .ico{background:linear-gradient(145deg,#fff,#eee5ff 60%,#d6c6fa)!important;box-shadow:inset 0 2px 2px #fff,inset 0 -4px 8px #9973d833,0 5px 0 #c3afea,0 9px 16px #6740a924!important;color:#7045cf!important}
+.cat:nth-child(4n) .ico{background:linear-gradient(145deg,#fff,#dff6ff 60%,#b8e7f8)!important;box-shadow:inset 0 2px 2px #fff,inset 0 -4px 8px #5eb8d833,0 5px 0 #a4d8e9,0 9px 16px #187fa524!important;color:#148eb8!important}
+.trust-icon{
+  border:1px solid #d5e0f8!important;
+  background:linear-gradient(145deg,#fff,#e7edff 65%,#cbd8fa)!important;
+  box-shadow:inset 0 2px 3px #fff,inset 0 -3px 5px #8aa3dd44,0 4px 0 #b3c2e8,0 8px 14px #254a9825!important;
+  text-shadow:0 3px 5px #3155a755;
+  transform:perspective(400px) rotateX(8deg) translateZ(8px);
+}
+.trust-item:hover .trust-icon{transform:perspective(400px) rotateY(-12deg) translateY(-4px) translateZ(14px)}
+.mark{
+  background:linear-gradient(145deg,#527bff 0%,#3155df 48%,#6941c9 100%)!important;
+  box-shadow:inset 0 2px 3px #ffffff88,inset 0 -5px 10px #101d6c55,0 5px 0 #233d9c,0 10px 20px #071b5a66!important;
+  transform:perspective(500px) rotateY(-9deg) rotateX(7deg);
+}
+.mark svg{filter:drop-shadow(0 3px 2px #06194e88);transform:translateZ(9px)}
+.brand:hover .mark{transform:perspective(500px) rotateY(-16deg) rotateX(12deg) translateY(-3px)}
+.thumb-symbol{
+  border:1px solid #fff!important;
+  background:linear-gradient(145deg,#fff 0%,#f1f4ff 55%,#dbe5ff 100%)!important;
+  box-shadow:inset 0 2px 4px #fff,inset 0 -5px 9px #8ba5df55,0 7px 0 #b6c6eb,0 13px 22px #1d3c812c!important;
+  transform:perspective(500px) rotateX(10deg) translateZ(12px);
+  text-shadow:0 3px 4px #3357a955;
+}
+.thumb-symbol svg{filter:drop-shadow(0 4px 2px #3457a955);transform:translateZ(10px)}
+.card:hover .thumb-symbol{transform:perspective(500px) rotateX(0) rotateY(-8deg) translateY(-4px) translateZ(20px)}
+.search button{
+  box-shadow:inset 0 2px 3px #ffffff80,inset 0 -4px 8px #1a268b55,0 5px 0 #263cae,0 9px 17px #182e9b55!important;
+  transform:translateY(-2px);
+}
+.search button:active{transform:translateY(2px);box-shadow:inset 0 2px 4px #111a6633,0 1px 0 #263cae!important}
+.visual-book{filter:drop-shadow(0 22px 15px #030b2d99)!important;transform:perspective(700px) rotateY(-15deg) rotateX(8deg) rotateZ(-5deg)!important}
+.visual-book svg{filter:drop-shadow(0 5px 2px #8ba9ff55)}
+@media(prefers-reduced-motion:reduce){.ico,.trust-icon,.mark,.thumb-symbol,.search button{transition:none!important}}
+
 </style>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"المعلومة الذكية – Smart Info Encyclopedia","url":"https://smart-info-encyclopedia-site.pages.dev/","inLanguage":["ar","en"],"description":"موسوعة معرفية تقدم شروحات ومعلومات مبسطة بالعربية والإنجليزية."}</script>
 
