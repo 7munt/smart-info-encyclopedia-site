@@ -153,6 +153,9 @@ def verify_sources(sources):
     break
    if response is None:
     raise ValueError("source request did not complete")
+   if response.is_redirect or response.is_permanent_redirect:
+    response.close()
+    raise ValueError("source exceeded redirect limit")
    status=response.status_code
    final_url=current
    response.close()
