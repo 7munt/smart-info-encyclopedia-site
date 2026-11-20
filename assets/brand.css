@@ -281,3 +281,27 @@ body{background:radial-gradient(ellipse at 50% 0%,#e5edff 0,transparent 36%),var
 .article,.card{border-color:#e1e8f8!important;box-shadow:0 12px 34px #102c6610!important;border-radius:22px!important}
 h1,.article h1{color:#142b60!important}.crumb,.category,.tag{color:#4268c7!important}
 a{transition:color .2s}
+
+
+/* Smart Info — editorial redesign shared by all inner pages */
+:root{--si-midnight:#0b1740;--si-blue:#315de8;--si-violet:#7653dc;--si-paper:#f7f8fc;--si-ink:#182747;--si-muted:#71809c;--si-line:#e5e9f2}
+body{background:radial-gradient(ellipse at 85% 0%,#edf1ff 0,transparent 34%),#f7f8fc!important;color:var(--si-ink)!important;font-family:Tahoma,Arial,sans-serif!important}
+.top{background:var(--si-midnight)!important;box-shadow:0 5px 24px #07133220!important;border:0!important}
+.mark{background:linear-gradient(145deg,#3565f2,#8156e8)!important;color:#fff!important;border-radius:15px!important}
+.brand small{color:#aabdf3!important}
+.navlinks a{color:#dce5ff!important}
+.lang{border:1px solid #6375a8!important;background:#ffffff0b!important;color:#fff!important;border-radius:99px!important}
+.wrap{max-width:1000px!important}
+.article,.card,.panel{background:#fff!important;border:1px solid var(--si-line)!important;border-radius:22px!important;box-shadow:0 14px 38px #14264a0c!important}
+h1,.article h1,.card h1{color:#192d54!important;font-weight:850!important;line-height:1.35!important}
+h2,.article h2,.card h2{color:#263e70!important}
+.crumb,.category,.tag{color:#496bd0!important}
+.desc{color:#74819a!important;border-color:#e9edf4!important}
+.body{color:#2b3c5b!important;line-height:2.05!important}
+.icon{background:linear-gradient(145deg,#e4ebff,#f0eaff)!important;border:1px solid #dce5fb!important;color:#3c63d8!important;border-radius:18px!important}
+.references,.article-toc,.interactive-tool,.knowledge-quiz,.task-planner,.trip-checklist{background:#f5f7ff!important;border:1px solid #e1e8f8!important;border-radius:17px!important}
+.references strong{color:#243e73!important}
+a{transition:color .2s}
+.footer{background:var(--si-midnight)!important;color:#dce5ff!important;border-top:4px solid var(--si-violet)!important}
+.footer a,.footer p{color:#c7d2ef!important}
+@media(max-width:650px){.wrap{width:calc(100% - 32px)!important}.article,.card,.panel{border-radius:18px!important}.body{font-size:16px!important;line-height:2!important}}
