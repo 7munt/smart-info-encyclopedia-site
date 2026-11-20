@@ -27,11 +27,14 @@ def norm(s):
  s = re.sub(r"[\W_]+", "", s, flags=re.UNICODE)
  return s
 
-def gemini(prompt, temperature=0.55):
+def gemini(prompt, temperature=0.55, grounded_search=False):
  if not API_KEY:
   raise RuntimeError("Missing GEMINI_API_KEY repository secret")
  payload = {"contents":[{"role":"user","parts":[{"text":prompt}]}],
             "generationConfig":{"temperature":temperature,"responseMimeType":"application/json","maxOutputTokens":8192}}
+ if grounded_search:
+  payload["tools"] = [{"googleSearch": {}}]
+  payload["generationConfig"].pop("responseMimeType", None)
  last = None
  for attempt in range(5):
   try:
@@ -222,7 +225,8 @@ def repair_sources(article, source_error):
  failed = article.get("sources", [])
  for attempt in range(3):
   replacement = gemini(f"""
-أنت مساعد بحث للمراجع. نحتاج خمسة مصادر بديلة حقيقية ومباشرة لمقال موسوعي عربي.
+أنت مساعد بحث للمراجع. استخدم بحث Google المدمج للعثور على صفحات منشورة فعلاً، ولا تعتمد على الذاكرة أو تخمين الروابط.
+نحتاج خمسة مصادر بديلة حقيقية ومباشرة لمقال موسوعي عربي.
 الموضوع: {article.get("title_ar")}
 ملخص المقال: {json.dumps(article.get("sections", [])[:3], ensure_ascii=False)[:3500]}
 روابط سبق اقتراحها ولا نريد تكرارها: {json.dumps(failed, ensure_ascii=False)}
@@ -230,7 +234,7 @@ def repair_sources(article, source_error):
 في هذه المحاولة رقم {attempt + 1}: اقترح خمسة روابط مختلفة تماماً قدر الإمكان، من صفحات محددة في مواقع حكومية أو جامعات أو منظمات معيارية معروفة، وتأكد من كتابة المسار الكامل للصفحة لا اسم النطاق فقط.
 لا تستخدم أي رابط من القائمة السابقة ولا تخترع عناوين أو مسارات تخمينية. إذا لم تكن واثقاً من وجود الرابط فلا تضعه.
 أعد JSON فقط بالشكل: {{"sources":[{{"title":"اسم الصفحة","url":"https://..."}}]}}
-""", temperature=0.1)
+""", temperature=0.7, grounded_search=True)
   proposed = replacement.get("sources", []) if isinstance(replacement, dict) else []
   if proposed:
    ok, checked, err = verify_sources(proposed)
