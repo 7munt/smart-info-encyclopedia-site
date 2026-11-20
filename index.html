@@ -221,8 +221,9 @@ return '<a class="cat'+(filter===c.id?' active':'')+'" href="#latest" data-cat="
 }).join("");
 document.querySelectorAll("[data-cat]").forEach(el=>el.onclick=()=>{filter=el.dataset.cat;renderCats();renderPosts()});
 }
+function normalizeSearch(value){return String(value||"").toLowerCase().normalize("NFKD").replace(/[\u064B-\u065F\u0670]/g,"").replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه").replace(/[^\p{L}\p{N}\s]/gu," ").replace(/\s+/g," ").trim()}
 function renderPosts(){
-const list=posts.filter(p=>(filter==="all"||p.cat===filter)&&((p.ar+" "+p.en+" "+p.descAr+" "+p.descEn).toLowerCase().includes(query)));
+const list=posts.filter(p=>{const category=cats.find(item=>item.id===p.cat);const searchable=[p.ar,p.en,p.descAr,p.descEn,p.bodyAr,p.bodyEn,p.slug,category?.ar,category?.en].join(" ");return (filter==="all"||p.cat===filter)&&normalizeSearch(searchable).includes(query)});
 document.getElementById("resultsMeta").textContent=t("عدد المقالات: ","Articles: ")+list.length;
 document.getElementById("articles").innerHTML=list.map((p,index)=>{
 const category=cats.find(item=>item.id===p.cat);
@@ -234,7 +235,7 @@ function openPost(i){const p=posts[i];document.getElementById("detail").innerHTM
 function setLang(next){lang=next;document.documentElement.lang=lang;document.documentElement.dir=lang==="ar"?"rtl":"ltr";document.querySelectorAll("[data-ar]").forEach(el=>{el.innerHTML=el.dataset[lang]});document.getElementById("lang").textContent=lang==="ar"?"English":"العربية";document.getElementById("q").placeholder=t("ابحث عن معلومة...","Search for information...");document.getElementById("q").setAttribute("aria-label",t("ابحث عن معلومة","Search for information"));document.getElementById("close").setAttribute("aria-label",t("إغلاق","Close"));renderCats();renderPosts()}
 document.querySelectorAll("[data-search-term]").forEach(chip=>chip.addEventListener("click",()=>{
  const term=lang==="ar"?chip.dataset.searchTerm:({ "الذكاء الاصطناعي":"generative AI","الميزانية":"budget","كلمة مرور":"password"}[chip.dataset.searchTerm]||chip.dataset.searchTerm);
- document.getElementById("q").value=term;query=term.toLowerCase();filter="all";renderCats();renderPosts();document.getElementById("latest").scrollIntoView({behavior:"smooth"});
+ document.getElementById("q").value=term;query=normalizeSearch(term);filter="all";renderCats();renderPosts();document.getElementById("latest").scrollIntoView({behavior:"smooth"});
 }));
-document.getElementById("lang").onclick=()=>setLang(lang==="ar"?"en":"ar");document.getElementById("searchBtn").onclick=()=>{query=document.getElementById("q").value.trim().toLowerCase();filter="all";renderPosts()};document.getElementById("q").addEventListener("input",()=>{query=document.getElementById("q").value.trim().toLowerCase();filter="all";renderPosts()});document.getElementById("q").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("searchBtn").click()});document.getElementById("close").onclick=()=>document.getElementById("modal").classList.remove("open");document.getElementById("modal").onclick=e=>{if(e.target.id==="modal")e.currentTarget.classList.remove("open")};renderCats();renderPosts();
+document.getElementById("lang").onclick=()=>setLang(lang==="ar"?"en":"ar");document.getElementById("searchBtn").onclick=()=>{query=normalizeSearch(document.getElementById("q").value);filter="all";renderPosts()};document.getElementById("q").addEventListener("input",()=>{query=document.getElementById("q").value.trim().toLowerCase();filter="all";renderPosts()});document.getElementById("q").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("searchBtn").click()});document.getElementById("close").onclick=()=>document.getElementById("modal").classList.remove("open");document.getElementById("modal").onclick=e=>{if(e.target.id==="modal")e.currentTarget.classList.remove("open")};renderCats();renderPosts();
 </script></body></html>
