@@ -258,3 +258,17 @@ footer:not(.footer) p{display:flex;flex-wrap:wrap;gap:8px 15px}
 .trip-check-row:has(input:checked){background:#f3f8ff;border-color:#cbdaf6}
 .trip-check-row input{flex:none;margin-top:3px}
 @media(max-width:560px){.task-planner,.trip-checklist{padding:18px 14px}.task-planner h2,.trip-checklist h2{font-size:18px}.task-entry button{padding:9px 11px}}
+
+
+/* SMART INFO — unified 2026 brand tokens for all editorial pages */
+:root{--si-ink:#17243b;--si-muted:#68758b;--si-navy:#101d36;--si-blue:#3568d4;--si-violet:#7861c9;--si-paper:#f5f7fb;--si-line:#e3e8f1}
+body{background:radial-gradient(ellipse at 8% 0%,#eaf0ff 0,transparent 32%),var(--si-paper)!important;color:var(--si-ink)!important}
+.top{background:linear-gradient(110deg,#101d36,#1a3158)!important;box-shadow:0 8px 26px #101d3618!important}
+.article,.card{border:1px solid var(--si-line)!important;border-radius:22px!important;box-shadow:0 14px 38px #172b480b!important}
+.article:before,.card:before{background:linear-gradient(90deg,var(--si-blue),var(--si-violet),#6bbbd2)!important}
+h1,.article h1,.card h1{color:#172b4a!important}
+h2,.article h2,.card h2{color:#24416e!important}
+.category,.tag{background:#eef2fc!important;color:#3d64b5!important}
+.article .topic-icon,.article .icon{background:linear-gradient(145deg,#edf2ff,#f4f0fc)!important;border-color:#e0e7f3!important;color:#416bd0!important}
+.references,.article-toc,.interactive-tool,.knowledge-quiz,.task-planner,.trip-checklist{border-color:#e0e7f2!important}
+a:focus-visible,button:focus-visible{outline-color:#7896e3!important}
