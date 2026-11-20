@@ -241,7 +241,7 @@ def repair_sources(article, source_error):
  return []
 
 def editorial_review(article, sources):
- for round_no in range(2):
+ for round_no in range(3):
   result=gemini(f"""
 أنت مراجع تحريري مستقل. قيّم المقال التالي قبل النشر.
 تحقق من: الدقة العامة، وضوح الشرح، التكرار، سلامة اللغة، العنوان والوصف، وعدم وجود ادعاءات رقمية/علمية غير مسندة أو نصائح عالية المخاطر.
@@ -261,10 +261,10 @@ def editorial_review(article, sources):
    return False
   if result.get("approved") is True and score >= 90 and not corrections:
    return True
-  if round_no == 1 or not corrections:
+  if round_no == 2 or not corrections:
    print("Rejected by editorial review:", result)
    return False
-  print("Applying editorial corrections and requesting a second review.")
+  print(f"Applying editorial corrections and requesting review round {round_no + 2}/3.")
   revised=gemini(f"""
 أنت محرر عربي. نفّذ التعديلات المحددة أدناه على المقال، ثم أعد المقال كاملاً ككائن JSON فقط.
 التعديلات المطلوبة من المراجع: {json.dumps(corrections,ensure_ascii=False)}
