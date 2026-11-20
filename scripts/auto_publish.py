@@ -175,13 +175,34 @@ def build_html(a, sources):
 <link rel="icon" href="../favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/brand.css">
 <script type="application/ld+json">{json.dumps(schema,ensure_ascii=False)}</script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2953917327439885" crossorigin="anonymous"></script>
-</head><body><header class="top"><div class="nav"><a href="../index.html">المعلومة الذكية</a><a href="../index.html">العودة إلى الموسوعة</a></div></header>
+</head><body><div class="reading-progress" aria-hidden="true"><span id="readingProgressBar"></span></div><header class="top"><div class="nav"><a href="../index.html">المعلومة الذكية</a><a href="../index.html">العودة إلى الموسوعة</a></div></header>
 <main class="wrap"><p class="crumb"><a href="../index.html">الرئيسية</a> / {html.escape(a["category_ar"])}</p>
 <article class="article"><div class="icon">{a["icon"]}</div><div class="category">{html.escape(a["category_ar"])}</div>
-<h1>{title}</h1><p class="desc">{desc}</p><div class="body">{body}</div>
+<h1>{title}</h1><p class="desc">{desc}</p><div class="reading-meta" aria-live="polite"><strong id="readingTime">وقت القراءة: —</strong><span aria-hidden="true">•</span><span>مقال تعليمي</span></div><div class="body" id="articleContent">{body}</div>
 <section class="references"><strong>المصادر والمراجع</strong><ol>{refs}</ol></section>
 <div class="note">محتوى تعليمي عام. راجع المصادر الأصلية، وتحقق من المعلومات المتغيرة قبل اتخاذ القرارات.</div>
-</article></main><footer class="footer"><a href="../index.html">العودة إلى الموسوعة</a> · <a href="../about.html">من نحن</a> · <a href="../privacy.html">سياسة الخصوصية</a> · <a href="../editorial-policy.html">معايير المحتوى</a> · <a href="../contact.html">اتصل بنا</a></footer></body></html>'''
+</article></main><footer class="footer"><a href="../index.html">العودة إلى الموسوعة</a> · <a href="../about.html">من نحن</a> · <a href="../privacy.html">سياسة الخصوصية</a> · <a href="../editorial-policy.html">معايير المحتوى</a> · <a href="../contact.html">اتصل بنا</a></footer>
+<script>
+(function(){
+ const content=document.getElementById("articleContent");
+ const time=document.getElementById("readingTime");
+ const bar=document.getElementById("readingProgressBar");
+ if(content&&time){
+  const words=(content.innerText||content.textContent||"").trim().split(/\\s+/).filter(Boolean).length;
+  const minutes=Math.max(1,Math.ceil(words/200));
+  time.textContent="وقت القراءة: "+minutes+" دقائق تقريباً";
+ }
+ function updateProgress(){
+  if(!bar)return;
+  const max=document.documentElement.scrollHeight-window.innerHeight;
+  const progress=max>0?Math.min(100,Math.max(0,(window.scrollY/max)*100)):0;
+  bar.style.width=progress+"%";
+ }
+ window.addEventListener("scroll",updateProgress,{passive:true});
+ window.addEventListener("resize",updateProgress);
+ updateProgress();
+})();
+</script></body></html>'''
 
 def main():
  if not API_KEY: raise SystemExit("GEMINI_API_KEY is not configured in repository secrets.")
