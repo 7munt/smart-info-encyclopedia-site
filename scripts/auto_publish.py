@@ -348,7 +348,13 @@ def main():
  install_analytics_on_existing_articles()
  if not API_KEY: raise SystemExit("GEMINI_API_KEY is not configured in repository secrets.")
  index,sitemap,slugs,titles=load_existing()
- count=max(1,min(3,int(os.getenv("ARTICLE_COUNT","3") or "3")))
+ raw_count = str(os.getenv("ARTICLE_COUNT","3") or "3").strip()
+ count_match = re.search(r"\d+", raw_count)
+ if not count_match:
+  raise SystemExit(f"Invalid ARTICLE_COUNT value: {raw_count!r}. Use 1, 2, or 3.")
+ count = max(1, min(3, int(count_match.group(0))))
+ if raw_count != count_match.group(0):
+  print(f"ARTICLE_COUNT input {raw_count!r} normalized to {count}.")
  used=[]
  published=0
  max_attempts = min(12, count * 4)
