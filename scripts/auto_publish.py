@@ -31,7 +31,7 @@ def gemini(prompt, temperature=0.55):
  if not API_KEY:
   raise RuntimeError("Missing GEMINI_API_KEY repository secret")
  payload = {"contents":[{"role":"user","parts":[{"text":prompt}]}],
-            "generationConfig":{"temperature":temperature,"responseMimeType":"application/json"}}
+            "generationConfig":{"temperature":temperature,"responseMimeType":"application/json","maxOutputTokens":8192}}
  last = None
  for attempt in range(5):
   try:
@@ -52,11 +52,24 @@ def gemini(prompt, temperature=0.55):
    parts = candidates[0].get("content", {}).get("parts", []) if candidates else []
    generated = next((part.get("text") for part in parts if isinstance(part,dict) and part.get("text")), "")
    if not generated:
-    raise ValueError("Gemini returned no text content")
-   generated = re.sub(r"^\s*```(?:json)?\s*|\s*```\s*$", "", generated)
-   parsed = json.loads(generated)
+    finish = candidates[0].get("finishReason", "no candidate") if candidates else "no candidate"
+    raise ValueError(f"Gemini returned no text content (finishReason={finish})")
+   generated = re.sub(r"^\s*```(?:json)?\s*|\s*```\s*$", "", generated).strip()
+   try:
+    parsed = json.loads(generated)
+   except json.JSONDecodeError:
+    start = generated.find("{")
+    end = generated.rfind("}")
+    if start < 0 or end <= start:
+     raise ValueError("Gemini response did not contain a JSON object")
+    parsed = json.loads(generated[start:end + 1])
+   if isinstance(parsed, list):
+    if len(parsed) == 1 and isinstance(parsed[0], dict):
+     parsed = parsed[0]
+    elif parsed and all(isinstance(item,dict) and "url" in item for item in parsed):
+     parsed = {"sources": parsed}
    if not isinstance(parsed, dict):
-    raise ValueError("Gemini response must be a JSON object")
+    raise ValueError(f"Gemini response must be a JSON object (received {type(parsed).__name__})")
    return parsed
   except (requests.Timeout, requests.ConnectionError) as exc:
    last = f"Gemini network error: {type(exc).__name__}"
@@ -110,7 +123,7 @@ sources (مصفوفة من 3 إلى 5 مصادر أصلية موثوقة، لك�
   print(f"Generated article is short ({count_words(data)} words); requesting an expansion.")
   expanded = gemini(f"""
 وسّع المقال التالي دون تغيير موضوعه أو عنوانه أو رابطه أو مصادره.
-المطلوب: نص عربي أصلي لا يقل عن 700 كلمة فعلية، موزع على 6 إلى 8 أقسام واضحة.
+المطلوب: نص عربي أصلي لا يقل عن 700 كلمة فعلية، موزع على 6 إلى 8 أقسام واضحة. أعد كائن JSON واحداً فقط وليس مصفوفة، ولا تضع أي شرح خارج JSON.
 أضف شرحاً عملياً وأمثلة مفيدة وتفاصيل دقيقة، ولا تكرر الأفكار ولا تخترع معلومات أو مصادر.
 احتفظ بنفس مفاتيح JSON وبنية sections و paragraphs_ar. أعد JSON كاملاً فقط.
 المقال الحالي: {json.dumps(data,ensure_ascii=False)}
