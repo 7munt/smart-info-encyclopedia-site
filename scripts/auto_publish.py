@@ -47,10 +47,10 @@ def gemini(prompt, temperature=0.55):
 def load_existing():
  index = (ROOT / "index.html").read_text(encoding="utf-8")
  sitemap = (ROOT / "sitemap.xml").read_text(encoding="utf-8")
- slugs = set(re.findall(r'slug:"([a-z0-9-]+)"', index))
+ slugs = set(re.findall(r'(?:"slug"|slug)\s*:\s*"([a-z0-9-]+)"', index))
  titles = set()
- for t in re.findall(r'ar:"((?:\\.|[^"\\])*)"', index):
-  try: titles.add(norm(json.loads('"'+t+'"')))
+ for t in re.findall(r'(?:"ar"|ar)\s*:\s*("(?:\\.|[^"\\])*")', index):
+  try: titles.add(norm(json.loads(t)))
   except Exception: titles.add(norm(t))
  return index, sitemap, slugs, titles
 
@@ -137,6 +137,17 @@ def verify_sources(sources):
   return True, good, ""
  return False, good, f"Only {len(good)} sources could be opened; need 2. " + "; ".join(failures[:3])
 
+def repair_sources(article, source_error):
+ replacement = gemini(f"""
+روابط المصادر المقترحة للمقال التالي تعذر فتح بعضها. اقترح 3 إلى 5 روابط بديلة مباشرة لصفحات رسمية/أكاديمية حقيقية تتناول نفس الادعاءات.
+لا تضع الصفحة الرئيسية للمؤسسة إن أمكن، ولا تخترع روابط أو عناوين.
+الموضوع: {article.get("title_ar")}
+الروابط التي فشلت: {json.dumps(article.get("sources", []), ensure_ascii=False)}
+سبب الفشل: {source_error}
+أعد JSON فقط بالشكل: {{"sources":[{{"title":"اسم الصفحة","url":"https://..."}}]}}
+""", temperature=0.1)
+ return replacement.get("sources", []) if isinstance(replacement, dict) else []
+
 def editorial_review(article, sources):
  result=gemini(f"""
 أنت مراجع تحريري مستقل. قيّم المقال التالي قبل النشر.
@@ -210,7 +221,10 @@ def main():
  count=max(1,min(3,int(os.getenv("ARTICLE_COUNT","3") or "3")))
  used=[]
  published=0
- for n in range(count):
+ max_attempts = min(6, count * 2)
+ for n in range(max_attempts):
+  if published >= count:
+   break
   try:
    topic_data=make_topic(titles,slugs,used)
    topic=str(topic_data.get("topic","")).strip()
@@ -221,6 +235,10 @@ def main():
    if slug in slugs or norm(article["title_ar"]) in titles: raise ValueError("Duplicate slug/title")
    if (ROOT/"articles"/f"{slug}.html").exists(): raise ValueError("Article file already exists")
    ok, sources, source_error=verify_sources(article.get("sources",[]))
+   if not ok:
+    print("Repairing source links:", source_error)
+    article["sources"] = repair_sources(article, source_error)
+    ok, sources, source_error=verify_sources(article.get("sources",[]))
    if not ok: raise ValueError(source_error)
    if not editorial_review(article,sources): raise ValueError("Editorial review did not approve")
    # The homepage data model is intentionally bilingual and uses plain text for bodyAr.
@@ -239,7 +257,7 @@ def main():
  if published:
   (ROOT/"index.html").write_text(index,encoding="utf-8")
   (ROOT/"sitemap.xml").write_text(sitemap,encoding="utf-8")
- print(f"Finished. Published {published} of {count} attempted.")
+ print(f"Finished. Published {published} of {count} requested after {n + 1 if 'n' in locals() else 0} attempts.")
  if published == 0: print("No changes made; inspect workflow logs for rejection reasons.")
 
 if __name__=="__main__":
