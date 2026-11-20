@@ -6,7 +6,7 @@ import requests
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 BASE = "https://smart-info-encyclopedia-site.pages.dev"
 API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
-MODEL = "gemini-2.5-flash"
+MODEL = "gemini-3.5-flash-lite"
 API = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent"
 CATEGORIES = {
  "tech": ("التقنية والذكاء الاصطناعي", "Technology & AI", "🤖"),
