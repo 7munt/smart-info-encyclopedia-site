@@ -33,17 +33,37 @@ def gemini(prompt, temperature=0.55):
  payload = {"contents":[{"role":"user","parts":[{"text":prompt}]}],
             "generationConfig":{"temperature":temperature,"responseMimeType":"application/json"}}
  last = None
- for attempt in range(6):
-  r = requests.post(API, headers={"x-goog-api-key": API_KEY}, json=payload, timeout=120)
-  if r.status_code in (429, 500, 502, 503):
-   last = f"Gemini HTTP {r.status_code}: {r.text[:500]}"
-   time.sleep(15 * (attempt + 1)); continue
-  r.raise_for_status()
-  data = r.json()
-  text = data["candidates"][0]["content"]["parts"][0]["text"]
-  text = re.sub(r"^\s*```(?:json)?\s*|\s*```\s*$", "", text)
-  return json.loads(text)
- raise RuntimeError(last or "Gemini request failed")
+ for attempt in range(5):
+  try:
+   r = requests.post(API, headers={"x-goog-api-key": API_KEY}, json=payload, timeout=120)
+   if r.status_code in (429, 500, 502, 503, 504):
+    last = f"Gemini HTTP {r.status_code}: {r.text[:300]}"
+    retry_after = r.headers.get("Retry-After", "")
+    try:
+     delay = min(45, max(5, int(retry_after)))
+    except (TypeError, ValueError):
+     delay = min(40, 5 * (2 ** attempt))
+    print(f"Gemini temporarily unavailable (HTTP {r.status_code}); retry {attempt + 1}/5 in {delay}s.")
+    time.sleep(delay)
+    continue
+   r.raise_for_status()
+   response = r.json()
+   candidates = response.get("candidates") or []
+   parts = candidates[0].get("content", {}).get("parts", []) if candidates else []
+   generated = next((part.get("text") for part in parts if isinstance(part,dict) and part.get("text")), "")
+   if not generated:
+    raise ValueError("Gemini returned no text content")
+   generated = re.sub(r"^\s*```(?:json)?\s*|\s*```\s*$", "", generated)
+   parsed = json.loads(generated)
+   if not isinstance(parsed, dict):
+    raise ValueError("Gemini response must be a JSON object")
+   return parsed
+  except (requests.Timeout, requests.ConnectionError) as exc:
+   last = f"Gemini network error: {type(exc).__name__}"
+   delay = min(40, 5 * (2 ** attempt))
+   print(f"{last}; retry {attempt + 1}/5 in {delay}s.")
+   time.sleep(delay)
+ raise RuntimeError(last or "Gemini request failed after retries")
 
 def load_existing():
  index = (ROOT / "index.html").read_text(encoding="utf-8")
@@ -80,8 +100,8 @@ description_ar (وصف 120-160 حرفاً تقريباً)، description_en،
 sections (مصفوفة من 5 إلى 8 عناصر، لكل عنصر heading_ar و paragraphs_ar كمصفوفة من 1-3 فقرات)،
 summary_en (فقرتان موجزتان باللغة الإنجليزية)،
 sources (مصفوفة من 3 إلى 5 مصادر أصلية موثوقة، لكل مصدر title و url).
-المقال العربي يجب أن يكون بين 650 و1000 كلمة قدر الإمكان، ولا يقل عن 500 كلمة، يتضمن مقدمة وعناوين فرعية وخطوات أو أمثلة وأسئلة شائعة عند ملاءمة الموضوع.
-لا تخترع أرقاماً أو دراسات أو اقتباسات. اعتمد على مصادر رسمية/أكاديمية/معايير معروفة ذات صلة مباشرة، وتجنب الروابط الرئيسية العامة إن أمكن. لا تضع مصادر وهمية. لا تستخدم نصاً تسويقياً ولا تدعِ أن المقال تمت مراجعته بشرياً.
+المقال العربي يجب أن يكون بين 700 و1000 كلمة فعلية، ولا يقل مطلقاً عن 600 كلمة. اكتب 6 إلى 8 أقسام، وفي كل قسم فقرتان شارحتان على الأقل، مع مقدمة وخطوات أو أمثلة وأسئلة شائعة عند ملاءمة الموضوع.
+خصص مساحة كافية للشرح ولا تختصر الإجابة في تعريفات عامة. لا تخترع أرقاماً أو دراسات أو اقتباسات. اعتمد على 5 مصادر رسمية/أكاديمية/معايير معروفة ذات صلة مباشرة، بروابط صفحات محددة لا صفحات رئيسية عامة. لا تضع روابط تتوقع أنها غير موجودة ولا تكرر النطاق نفسه أكثر من مرتين. لا تستخدم نصاً تسويقياً ولا تدعِ أن المقال تمت مراجعته بشرياً.
 اكتب بصياغة طبيعية غير مكررة، وابتعد عن النصائح الطبية أو القانونية أو المالية الشخصية.
 """)
  def count_words(item):
@@ -186,15 +206,26 @@ def verify_sources(sources):
  return False, good, f"Only {len(good)} sources could be opened; need at least 3. " + "; ".join(failures[:3])
 
 def repair_sources(article, source_error):
- replacement = gemini(f"""
-روابط المصادر المقترحة للمقال التالي تعذر فتح بعضها. اقترح 3 إلى 5 روابط بديلة مباشرة لصفحات رسمية/أكاديمية حقيقية تتناول نفس الادعاءات.
-لا تضع الصفحة الرئيسية للمؤسسة إن أمكن، ولا تخترع روابط أو عناوين.
+ failed = article.get("sources", [])
+ for attempt in range(3):
+  replacement = gemini(f"""
+أنت مساعد بحث للمراجع. نحتاج خمسة مصادر بديلة حقيقية ومباشرة لمقال موسوعي عربي.
 الموضوع: {article.get("title_ar")}
-الروابط التي فشلت: {json.dumps(article.get("sources", []), ensure_ascii=False)}
-سبب الفشل: {source_error}
+ملخص المقال: {json.dumps(article.get("sections", [])[:3], ensure_ascii=False)[:3500]}
+روابط سبق اقتراحها ولا نريد تكرارها: {json.dumps(failed, ensure_ascii=False)}
+نتيجة فحص الروابط: {source_error}
+في هذه المحاولة رقم {attempt + 1}: اقترح خمسة روابط مختلفة تماماً قدر الإمكان، من صفحات محددة في مواقع حكومية أو جامعات أو منظمات معيارية معروفة، وتأكد من كتابة المسار الكامل للصفحة لا اسم النطاق فقط.
+لا تستخدم أي رابط من القائمة السابقة ولا تخترع عناوين أو مسارات تخمينية. إذا لم تكن واثقاً من وجود الرابط فلا تضعه.
 أعد JSON فقط بالشكل: {{"sources":[{{"title":"اسم الصفحة","url":"https://..."}}]}}
 """, temperature=0.1)
- return replacement.get("sources", []) if isinstance(replacement, dict) else []
+  proposed = replacement.get("sources", []) if isinstance(replacement, dict) else []
+  if proposed:
+   ok, checked, err = verify_sources(proposed)
+   if ok:
+    return checked
+   source_error = err
+   failed.extend(proposed)
+ return []
 
 def editorial_review(article, sources):
  result=gemini(f"""
@@ -323,9 +354,8 @@ def main():
    ok, sources, source_error=verify_sources(article.get("sources",[]))
    if not ok:
     print("Repairing source links:", source_error)
-    article["sources"] = repair_sources(article, source_error)
-    ok, sources, source_error=verify_sources(article.get("sources",[]))
-   if not ok: raise ValueError(source_error)
+    sources = repair_sources(article, source_error)
+   if len(sources) < 3: raise ValueError(f"Could not verify 3 reliable sources: {source_error}")
    if not editorial_review(article,sources): raise ValueError("Editorial review did not approve")
    # The homepage data model is intentionally bilingual and uses plain text for bodyAr.
    post={"cat":category,"slug":slug,"icon":article["icon"],"ar":article["title_ar"],"en":article.get("title_en",article["title_ar"]),"descAr":article["description_ar"],"descEn":article.get("description_en",article["description_ar"]),"bodyAr":"\n\n".join(sec.get("heading_ar","")+"\n"+"\n".join(sec.get("paragraphs_ar",[])) for sec in article["sections"]),"bodyEn":article.get("summary_en","")}
