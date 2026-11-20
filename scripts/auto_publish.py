@@ -251,7 +251,7 @@ def main():
  count=max(1,min(3,int(os.getenv("ARTICLE_COUNT","3") or "3")))
  used=[]
  published=0
- max_attempts = min(6, count * 2)
+ max_attempts = min(12, count * 4)
  for n in range(max_attempts):
   if published >= count:
    break
