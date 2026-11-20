@@ -27,6 +27,9 @@ def norm(s):
  s = re.sub(r"[\W_]+", "", s, flags=re.UNICODE)
  return s
 
+class GeminiQuotaError(RuntimeError):
+ pass
+
 def gemini(prompt, temperature=0.55, grounded_search=False):
  if not API_KEY:
   raise RuntimeError("Missing GEMINI_API_KEY repository secret")
@@ -39,6 +42,8 @@ def gemini(prompt, temperature=0.55, grounded_search=False):
  for attempt in range(5):
   try:
    r = requests.post(API, headers={"x-goog-api-key": API_KEY}, json=payload, timeout=120)
+   if r.status_code == 429 and ("exceeded your current quota" in r.text.lower() or "resource_exhausted" in r.text.lower()):
+    raise GeminiQuotaError("Gemini API quota/billing limit reached. Check Google AI Studio usage and billing before retrying.")
    if r.status_code in (429, 500, 502, 503, 504):
     last = f"Gemini HTTP {r.status_code}: {r.text[:300]}"
     retry_after = r.headers.get("Retry-After", "")
@@ -419,6 +424,9 @@ def main():
     sitemap=sitemap.replace("</urlset>",entry+"</urlset>")
    slugs.add(slug); titles.add(norm(article["title_ar"])); used.append(topic); published+=1
    print(f"Published candidate {published}: {slug}")
+  except GeminiQuotaError as exc:
+   print(f"STOPPING: {exc}")
+   raise SystemExit(str(exc))
   except Exception as exc:
    print(f"Article attempt {n+1} skipped: {exc}")
    continue
