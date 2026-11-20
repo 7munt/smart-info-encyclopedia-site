@@ -259,25 +259,25 @@ def build_html(a, sources):
 <div class="note">محتوى تعليمي عام. راجع المصادر الأصلية، وتحقق من المعلومات المتغيرة قبل اتخاذ القرارات.</div>
 </article></main><footer class="footer"><a href="../index.html">العودة إلى الموسوعة</a> · <a href="../about.html">من نحن</a> · <a href="../privacy.html">سياسة الخصوصية</a> · <a href="../editorial-policy.html">معايير المحتوى</a> · <a href="../contact.html">اتصل بنا</a></footer>
 <script>
-(function(){
+(function(){{
  const content=document.getElementById("articleContent");
  const time=document.getElementById("readingTime");
  const bar=document.getElementById("readingProgressBar");
- if(content&&time){
+ if(content&&time){{
   const words=(content.innerText||content.textContent||"").trim().split(/\\s+/).filter(Boolean).length;
   const minutes=Math.max(1,Math.ceil(words/200));
   time.textContent="وقت القراءة: "+minutes+" دقائق تقريباً";
- }
- function updateProgress(){
+ }}
+ function updateProgress(){{
   if(!bar)return;
   const max=document.documentElement.scrollHeight-window.innerHeight;
   const progress=max>0?Math.min(100,Math.max(0,(window.scrollY/max)*100)):0;
   bar.style.width=progress+"%";
- }
- window.addEventListener("scroll",updateProgress,{passive:true});
+ }}
+ window.addEventListener("scroll",updateProgress,{{passive:true}});
  window.addEventListener("resize",updateProgress);
  updateProgress();
-})();
+}})();
 </script></body></html>'''
 
 def install_analytics_on_existing_articles():
