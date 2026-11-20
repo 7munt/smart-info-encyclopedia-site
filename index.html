@@ -280,6 +280,85 @@ body{background:#f4f7ff;color:var(--ink);font-family:Tahoma,Arial,system-ui,sans
 @media(max-width:1000px){.cats{grid-template-columns:repeat(4,minmax(0,1fr))}.hero{min-height:auto}.hero:before{width:270px;height:270px}.articles{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.nav{height:68px;width:calc(100% - 28px)}.brand{font-size:15px}.mark{width:43px;height:43px}.brand small{font-size:7px}.navlinks{gap:10px}.navlinks a{display:none}.hero{padding:35px 0 25px}.hero-emblem{width:86px;height:65px}.hero-brand-name{font-size:36px}.hero:before{width:180px;height:180px;left:-80px;top:18px}.hero:after{font-size:105px;right:-8px;top:85px}.search{border-radius:18px}.search input{font-size:14px;padding:10px 12px}.search button{width:60px;min-width:60px}.quick-search{gap:7px}.quick-search button{padding:7px 11px;font-size:11px}#categories,.search-results-inline{width:calc(100% - 28px)}.cats{display:flex;overflow-x:auto;gap:10px;padding:4px 2px 12px;scroll-snap-type:x mandatory}.cat{flex:0 0 105px;min-height:105px;scroll-snap-align:start}.cat .ico{width:46px;height:46px}.articles{grid-template-columns:1fr;gap:14px}.thumb{height:150px}.search-results-inline{padding:22px 0 32px}.search-results-inline .section-head h2{font-size:22px}.trust-strip{flex-wrap:wrap;gap:15px}.trust-item{min-width:42%}}
 
+
+/* Complete redesign — editorial knowledge platform */
+:root{--midnight:#0b1740;--navy:#122653;--royal:#315de8;--violet:#7653dc;--gold:#f2b64b;--paper:#f7f8fc;--text:#182747;--muted:#71809c;--line:#e5e9f2}
+*{box-sizing:border-box}
+body{background:var(--paper)!important;color:var(--text)!important;font-family:Tahoma,Arial,sans-serif!important}
+.wrap{width:min(1240px,calc(100% - 64px))!important;margin-inline:auto}
+.top{background:var(--midnight)!important;position:sticky;top:0;z-index:50;border:0!important;box-shadow:0 5px 24px #07133220!important}
+.nav{height:82px!important;width:min(1240px,calc(100% - 64px))!important}
+.brand{font-size:22px!important;gap:14px!important;color:#fff!important}
+.mark{width:48px!important;height:48px!important;border-radius:15px!important;background:linear-gradient(145deg,#3565f2,#8156e8)!important;color:#fff!important}
+.mark svg{width:36px;height:36px}
+.brand small{font-size:9px!important;letter-spacing:2.1px!important;color:#aabdf3!important}
+.navlinks{gap:32px!important;font-size:14px!important;font-weight:700}
+.navlinks a{color:#dce5ff!important}
+.navlinks a:hover{color:#ffc66a!important}
+.lang{border:1px solid #6375a8!important;border-radius:99px!important;padding:9px 18px!important;background:#ffffff0b!important;color:white!important}
+.hero{position:relative!important;isolation:isolate;overflow:hidden;background:linear-gradient(115deg,#0b1740 0%,#142d69 58%,#263b82 100%)!important;color:#fff!important;padding:74px 0 76px!important;min-height:560px}
+.hero:before{content:"";position:absolute;z-index:-1;inset:0;background:radial-gradient(circle at 75% 42%,#6d85ff35,transparent 30%),radial-gradient(circle at 5% 100%,#5d43c833,transparent 34%),linear-gradient(90deg,transparent 49.8%,#ffffff0a 50%,transparent 50.2%);opacity:1!important}
+.hero:after{content:"";position:absolute;z-index:-1;width:600px;height:600px;border:1px solid #b4c4ff20;border-radius:50%;top:-350px;inset-inline-end:-150px;box-shadow:0 0 0 60px #b4c4ff08,0 0 0 120px #b4c4ff06}
+.hero-layout{display:grid;grid-template-columns:1.02fr .98fr;align-items:center;gap:clamp(35px,6vw,100px);min-height:410px}
+.hero-copy{max-width:650px}
+.hero-kicker{display:inline-flex;align-items:center;gap:10px;padding:8px 14px;border:1px solid #ffffff27;background:#ffffff0c;border-radius:99px;color:#c8d5ff;font-size:13px;font-weight:700}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#ffc45b;box-shadow:0 0 0 5px #ffc45b20}
+.hero h1{font-size:clamp(48px,6.4vw,82px)!important;line-height:1.12!important;letter-spacing:-2px!important;margin:26px 0 18px!important;color:#fff!important;font-weight:900!important}
+.hero h1 em{font-style:normal;color:#9bb6ff}
+.hero p{font-size:18px!important;line-height:2!important;color:#c4d0ef!important;max-width:530px;margin:0 0 30px!important}
+.search{display:flex;width:min(620px,100%);max-width:620px!important;background:#fff!important;border:1px solid #dbe4ff!important;border-radius:16px!important;padding:7px!important;box-shadow:0 16px 45px #020a2655!important;direction:rtl}
+.search input{padding:14px 17px!important;font-size:15px!important;color:#182747!important}
+.search button{width:58px;min-width:58px;padding:12px!important;display:grid;place-items:center;background:linear-gradient(140deg,#3266f1,#7653dc)!important;color:#fff!important;border-radius:11px!important}
+.search button svg{width:24px;height:24px;stroke:currentColor;stroke-width:2.3;fill:none}
+.quick-search{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:19px}
+.quick-search span{color:#aebde2!important;font-size:12px!important;font-weight:700}
+.quick-search button{padding:7px 13px!important;border-radius:99px!important;background:#ffffff10!important;border:1px solid #ffffff24!important;color:#e3eaff!important;font-size:12px!important}
+.quick-search button:hover{background:#ffffff20!important;border-color:#9bb2ff!important}
+.hero-visual{position:relative;min-height:370px;display:grid;place-items:center;isolation:isolate}
+.visual-glow{position:absolute;width:310px;height:310px;border-radius:50%;background:radial-gradient(circle,#8ba9ff55,#6454d922 55%,transparent 72%);filter:blur(10px)}
+.visual-orbit{position:absolute;border:1px solid #b8caff40;border-radius:50%;transform:rotate(-25deg)}
+.orbit-a{width:420px;height:210px}.orbit-b{width:360px;height:320px;transform:rotate(38deg)}
+.visual-book{position:relative;width:min(330px,78%);filter:drop-shadow(0 28px 30px #030b2d88);transform:rotate(-5deg)}
+.visual-book svg{width:100%;height:auto;overflow:visible}
+.floating-note{position:absolute;display:flex;align-items:center;gap:9px;padding:10px 14px;border:1px solid #ffffff38;border-radius:12px;background:#172d67d9;color:#fff;box-shadow:0 12px 30px #020a2a40;backdrop-filter:blur(12px);font-size:12px}
+.floating-note b{color:#ffc66a;font-size:11px}
+.note-one{top:45px;inset-inline-start:5%}.note-two{bottom:48px;inset-inline-end:4%}
+.visual-caption{position:absolute;bottom:0;display:flex;align-items:center;gap:9px;color:#d9e3ff;font-size:13px}
+.caption-mark{color:#ffc66a;font-size:20px}
+#categories{padding:40px 0 18px!important}
+#categories .section-head{margin-bottom:20px!important}
+.section h2{font-size:26px!important;color:#17294e!important}
+.sub{color:#7886a0!important}
+.cats{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:14px!important}
+.cat{padding:16px 18px!important;min-height:86px;background:#fff!important;border:1px solid var(--line)!important;border-radius:16px!important;box-shadow:0 4px 16px #10265308!important;transition:all .22s ease}
+.cat:hover,.cat.active{border-color:#b9c8f6!important;box-shadow:0 12px 28px #244ca51a!important;transform:translateY(-3px)}
+.cat .ico{width:48px!important;height:48px!important;border-radius:14px!important;background:#edf2ff!important;color:#4169dd!important}
+.cat b{font-size:13px!important;color:#263b67!important}
+.search-results-inline{padding:32px 0 54px!important}
+.search-results-inline .section-head{display:flex!important;align-items:end!important;justify-content:space-between!important;border-bottom:1px solid #e4e9f2;padding-bottom:16px;margin-bottom:22px!important}
+.search-results-inline .section-head h2{font-size:28px!important;color:#18294e!important}
+.results-meta{background:#fff;border:1px solid #e3e8f1;border-radius:99px;padding:6px 13px;color:#73819a;font-size:12px;font-weight:700}
+.articles{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:22px!important}
+.card{border:1px solid #e5e9f2!important;border-radius:18px!important;background:#fff!important;box-shadow:0 8px 25px #14264a0b!important;transition:transform .22s,box-shadow .22s!important}
+.card:hover{transform:translateY(-5px)!important;box-shadow:0 18px 40px #14264a18!important}
+.thumb{height:165px!important;background:linear-gradient(135deg,#dce7ff,#e9e3ff)!important;position:relative;overflow:hidden}
+.thumb:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,#ffffff9c,transparent 55%),linear-gradient(125deg,#4e77e71c,#8655e71a)}
+.thumb-symbol{position:relative;z-index:1;width:78px;height:78px;border-radius:24px;background:#ffffffdb;color:#3e65d9;display:grid;place-items:center;box-shadow:0 10px 25px #284a9b18}
+.thumb-symbol svg{width:42px;height:42px;stroke:currentColor;fill:none;stroke-width:2}
+.thumb-kicker{position:absolute;top:13px;inset-inline-start:15px;color:#667ba8;font-size:9px;letter-spacing:1.4px;font-weight:800}
+.cardbody{padding:19px 20px 22px!important}
+.tag{color:#496bd0!important;font-size:11px!important;font-weight:800}
+.card h3{color:#192d54!important;font-size:17px!important;line-height:1.55!important}
+.card p{color:#77849b!important;font-size:13px!important;line-height:1.8!important}
+.read{color:#355fe0!important;font-weight:800}
+.trust-strip{background:#fff!important;border-block:1px solid #e9edf4;padding:28px 5vw!important;display:flex;justify-content:center;gap:clamp(20px,7vw,100px);flex-wrap:wrap}
+.trust-item{color:#344b78!important}.trust-item small{color:#8490a5!important}
+#about{padding:50px 0!important}
+.footer{background:#0b1740!important;border-top:4px solid #6b55df;margin-top:0!important}
+.footer p,.footer a{color:#c7d2ef!important}
+@media(max-width:950px){.hero-layout{grid-template-columns:1fr .8fr;gap:24px}.hero h1{font-size:56px!important}.hero-visual{min-height:300px}.cats{grid-template-columns:repeat(2,minmax(0,1fr))!important}.articles{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:650px){.wrap,.nav{width:calc(100% - 32px)!important}.nav{height:68px!important}.brand{font-size:15px!important}.mark{width:42px!important;height:42px!important}.brand small{font-size:7px!important}.navlinks{display:none!important}.hero{padding:44px 0 40px!important;min-height:0}.hero-layout{grid-template-columns:1fr;gap:24px;min-height:0}.hero-copy{max-width:none}.hero h1{font-size:47px!important;margin:20px 0 13px!important}.hero p{font-size:15px!important;margin-bottom:22px!important}.hero-visual{min-height:220px}.visual-book{width:210px}.orbit-a{width:280px;height:145px}.orbit-b{width:245px;height:210px}.note-one{top:15px;inset-inline-start:0}.note-two{bottom:22px;inset-inline-end:0}.visual-caption{bottom:-3px}.quick-search{gap:6px}.quick-search button{font-size:10px!important;padding:6px 10px!important}#categories{padding:27px 0 8px!important}.cats{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}.cat{min-height:72px;padding:10px!important}.cat .ico{width:40px!important;height:40px!important}.search-results-inline{padding:25px 0 36px!important}.search-results-inline .section-head h2{font-size:22px!important}.articles{grid-template-columns:1fr!important;gap:14px!important}.thumb{height:145px!important}.trust-strip{gap:16px!important;padding:22px 16px!important}.trust-item{min-width:40%}.section{padding:28px 0!important}}
+
 </style>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"المعلومة الذكية – Smart Info Encyclopedia","url":"https://smart-info-encyclopedia-site.pages.dev/","inLanguage":["ar","en"],"description":"موسوعة معرفية تقدم شروحات ومعلومات مبسطة بالعربية والإنجليزية."}</script>
 
@@ -294,14 +373,19 @@ body{background:#f4f7ff;color:var(--ink);font-family:Tahoma,Arial,system-ui,sans
 <body>
 <header class="top"><div class="wrap nav"><a class="brand" href="#"><span class="mark"><svg class="brand-symbol" viewBox="0 0 64 64" role="img" aria-label="Smart Info"><defs><linearGradient id="brandGlow" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7dd3fc"/><stop offset=".55" stop-color="#a5b4fc"/><stop offset="1" stop-color="#c4b5fd"/></linearGradient></defs><path d="M8 17.5c8-4.2 16-3.8 24 1.5v32c-8-5.3-16-5.7-24-1.5z" fill="none" stroke="url(#brandGlow)" stroke-width="3.5" stroke-linejoin="round"/><path d="M56 17.5c-8-4.2-16-3.8-24 1.5v32c8-5.3 16-5.7 24-1.5z" fill="none" stroke="url(#brandGlow)" stroke-width="3.5" stroke-linejoin="round"/><path d="M32 19v32M43 8l2.5 6.5L52 17l-6.5 2.5L43 26l-2.5-6.5L34 17l6.5-2.5z" fill="url(#brandGlow)"/><circle cx="17" cy="30" r="2" fill="#fff"/><circle cx="48" cy="37" r="2" fill="#fff"/></svg></span><span><span data-ar="المعلومة الذكية" data-en="Smart Info">المعلومة الذكية</span><small>SMART INFO ENCYCLOPEDIA</small></span></a><nav class="navlinks"><a href="#categories" data-ar="الأقسام" data-en="Categories">الأقسام</a><a href="#latest" data-ar="أحدث المقالات" data-en="Latest articles">أحدث المقالات</a><a href="about.html" data-ar="عن الموسوعة" data-en="About">عن الموسوعة</a></nav><button type="button" class="lang" id="lang">English</button></div></header>
 <main><section class="hero">
-<div class="hero-atmosphere" aria-hidden="true"><span class="globe-art">◉</span><span class="book-art">⌑</span></div>
-<div class="wrap hero-content">
-<div class="hero-emblem" aria-hidden="true"><svg viewBox="0 0 120 88"><path d="M8 25Q34 10 60 30Q86 10 112 25V76Q86 61 60 80Q34 61 8 76Z" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/><path d="M60 30V80M26 38Q42 32 53 42M94 38Q78 32 67 42" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/><path d="M79 4l5 12 12 5-12 5-5 12-5-12-12-5 12-5z" fill="#ffb52e"/></svg></div>
-<div class="hero-brand-name" data-ar="المعلومة الذكية" data-en="Smart Info">المعلومة الذكية</div>
-<div class="hero-underline"></div>
-<p data-ar="المعلومة الصحيحة تبدأ من هنا. اكتشف المعرفة بأسلوب أوضح وأذكى." data-en="The right information starts here. Explore knowledge with clarity and confidence.">المعلومة الصحيحة تبدأ من هنا. اكتشف المعرفة بأسلوب أوضح وأذكى.</p>
-<div class="search"><input id="q" type="search" placeholder="ابحث عن معلومة..." aria-label="Search"><button type="button" id="searchBtn" data-ar="ابحث" data-en="Search" aria-label="Search">⌕</button></div>
-<div class="quick-search"><span data-ar="مواضيع شائعة:" data-en="Popular topics:">مواضيع شائعة:</span><button type="button" data-search-term="الذكاء الاصطناعي" data-ar="الذكاء الاصطناعي" data-en="Artificial intelligence">الذكاء الاصطناعي</button><button type="button" data-search-term="الميزانية" data-ar="الميزانية" data-en="Budget">الميزانية</button><button type="button" data-search-term="كلمة مرور" data-ar="كلمات المرور" data-en="Passwords">كلمات المرور</button></div>
+<div class="wrap hero-layout">
+<div class="hero-copy">
+<div class="hero-kicker"><span class="live-dot"></span><span data-ar="موسوعة المعرفة اليومية" data-en="Your everyday knowledge hub">موسوعة المعرفة اليومية</span></div>
+<h1 data-ar="كل ما تريد<br><em>أن تعرفه.</em>" data-en="Everything you want<br><em>to know.</em>">كل ما تريد<br><em>أن تعرفه.</em></h1>
+<p data-ar="إجابات واضحة، شروحات عملية، ومعرفة موثوقة في مكان واحد." data-en="Clear answers, practical explainers and useful knowledge in one place.">إجابات واضحة، شروحات عملية، ومعرفة موثوقة في مكان واحد.</p>
+<div class="search"><input id="q" type="search" placeholder="ابحث عن معلومة..." aria-label="Search"><button type="button" id="searchBtn" data-ar="ابحث" data-en="Search" aria-label="Search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg></button></div>
+<div class="quick-search"><span data-ar="الأكثر بحثاً" data-en="Trending">الأكثر بحثاً</span><button type="button" data-search-term="الذكاء الاصطناعي" data-ar="الذكاء الاصطناعي" data-en="AI">الذكاء الاصطناعي</button><button type="button" data-search-term="الميزانية" data-ar="الميزانية" data-en="Budget">الميزانية</button><button type="button" data-search-term="كلمة مرور" data-ar="كلمات المرور" data-en="Passwords">كلمات المرور</button></div>
+</div>
+<div class="hero-visual" aria-hidden="true">
+<div class="visual-glow"></div><div class="visual-orbit orbit-a"></div><div class="visual-orbit orbit-b"></div>
+<div class="visual-book"><svg viewBox="0 0 240 180"><path d="M18 40Q68 17 120 52Q172 17 222 40V151Q171 128 120 163Q69 128 18 151Z" fill="#fff" stroke="#d8e5ff" stroke-width="5"/><path d="M120 52V163" stroke="#b5c9f5" stroke-width="4"/><path d="M36 62Q75 49 101 69M36 82Q75 69 101 89M139 69Q165 49 204 62M139 89Q165 69 204 82" fill="none" stroke="#7898db" stroke-width="5" stroke-linecap="round"/><path d="M172 10l7 17 17 7-17 7-7 17-7-17-17-7 17-7z" fill="#ffb84a"/></svg></div>
+<div class="floating-note note-one"><b>01</b><span data-ar="اكتشف" data-en="Discover">اكتشف</span></div><div class="floating-note note-two"><b>02</b><span data-ar="تعلّم" data-en="Learn">تعلّم</span></div><div class="visual-caption"><span class="caption-mark">✦</span><span data-ar="المعرفة تبدأ بسؤال" data-en="Knowledge starts with a question">المعرفة تبدأ بسؤال</span></div>
+</div>
 </div></section>
 <section class="section wrap" id="categories"><div class="section-head"><div><h2 data-ar="تصفح حسب القسم" data-en="Explore categories">تصفح حسب القسم</h2><p class="sub" data-ar="اختر المجال الذي تريد اكتشافه" data-en="Choose a topic to explore">اختر المجال الذي تريد اكتشافه</p></div></div><div class="cats" id="cats"></div></section>
 <section class="section wrap search-results-inline" id="latest"><div class="section-head"><div><h2 data-ar="أحدث المقالات" data-en="Latest articles">أحدث المقالات</h2><p class="sub" data-ar="محتوى مختار لتبدأ رحلتك المعرفية" data-en="A selection to start your learning journey">محتوى مختار لتبدأ رحلتك المعرفية</p></div><div class="results-meta" id="resultsMeta" aria-live="polite"></div></div><div class="articles" id="articles"></div><div class="empty" id="empty" data-ar="لا توجد نتائج مطابقة. جرّب كلمة أخرى." data-en="No matching results. Try another search.">لا توجد نتائج مطابقة. جرّب كلمة أخرى.</div><div class="ad-note" data-ar="مساحة إعلانية مستقبلية — ستظهر الإعلانات بعد استيفاء شروط Google AdSense والموافقة على الموقع." data-en="Future ad placement — ads will appear after meeting Google AdSense requirements and site approval.">مساحة إعلانية مستقبلية — ستظهر الإعلانات بعد استيفاء شروط Google AdSense والموافقة على الموقع.</div></section>
