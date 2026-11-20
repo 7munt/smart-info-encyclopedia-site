@@ -241,26 +241,54 @@ def repair_sources(article, source_error):
  return []
 
 def editorial_review(article, sources):
- result=gemini(f"""
+ for round_no in range(2):
+  result=gemini(f"""
 أنت مراجع تحريري مستقل. قيّم المقال التالي قبل النشر.
 تحقق من: الدقة العامة، وضوح الشرح، التكرار، سلامة اللغة، العنوان والوصف، وعدم وجود ادعاءات رقمية/علمية غير مسندة أو نصائح عالية المخاطر.
 روابط المصادر التي أمكن فتحها فعلياً: {json.dumps(sources,ensure_ascii=False)}
 المقال: {json.dumps(article,ensure_ascii=False)}
-أعد JSON فقط: approved (true/false), score (0-100), reasons (مصفوفة قصيرة), corrections (مصفوفة تعديلات نصية ضرورية).
-ارفض إذا كان المحتوى يتضمن ادعاءات رئيسية غير موثوقة، أو إذا كانت المصادر لا تدعم الموضوع، أو المقال ضعيف/قصير/مكرر. لا توافق لمجرد أن النص منظم.
+أعد JSON فقط: approved (true/false), score (0-100), reasons (مصفوفة قصيرة), corrections (مصفوفة تعديلات محددة).
+إذا وجدت تعديلات لغوية أو تنظيمية أو توضيحات ضرورية، اذكرها بوضوح في corrections ولا تكتفِ برفض المقال. لا توافق لمجرد أن النص منظم.
 """, temperature=0.1)
- try:
-  score = int(result.get("score",0))
- except (TypeError, ValueError):
-  score = 0
- corrections = result.get("corrections", [])
- reasons = result.get("reasons", [])
- if (result.get("approved") is not True or score < 90
-     or not isinstance(corrections,list) or len(corrections) > 0
-     or not isinstance(reasons,list)):
-  print("Rejected by editorial review:", result)
-  return False
- return True
+  try:
+   score = int(result.get("score",0))
+  except (TypeError, ValueError):
+   score = 0
+  corrections = result.get("corrections", [])
+  reasons = result.get("reasons", [])
+  if not isinstance(corrections,list) or not isinstance(reasons,list):
+   print("Rejected: invalid editorial review format:", result)
+   return False
+  if result.get("approved") is True and score >= 90 and not corrections:
+   return True
+  if round_no == 1 or not corrections:
+   print("Rejected by editorial review:", result)
+   return False
+  print("Applying editorial corrections and requesting a second review.")
+  revised=gemini(f"""
+أنت محرر عربي. نفّذ التعديلات المحددة أدناه على المقال، ثم أعد المقال كاملاً ككائن JSON فقط.
+التعديلات المطلوبة من المراجع: {json.dumps(corrections,ensure_ascii=False)}
+حافظ على الموضوع والعنوان والرابط والمصادر والتصنيف، ولا تضف ادعاءات أو أرقاماً أو مراجع جديدة.
+حافظ على 5 إلى 8 أقسام، وعلى 600 كلمة عربية على الأقل، وعلى مفاتيح JSON وبنية الأقسام الأصلية.
+المقال الحالي: {json.dumps(article,ensure_ascii=False)}
+""", temperature=0.2)
+  if not isinstance(revised,dict):
+   print("Editorial correction response was not a JSON object.")
+   return False
+  for key in ("slug","title_ar","title_en","description_ar","description_en","sources","summary_en","category","icon","category_ar","category_en"):
+   if key not in revised and key in article:
+    revised[key]=article[key]
+  sections=revised.get("sections")
+  if not isinstance(sections,list) or not 5 <= len(sections) <= 8:
+   print("Editorial correction produced invalid section count.")
+   return False
+  word_count=len(" ".join(str(p) for sec in sections if isinstance(sec,dict) for p in (sec.get("paragraphs_ar",[]) if isinstance(sec.get("paragraphs_ar",[]),list) else [])).split())
+  if word_count < 600:
+   print(f"Editorial correction left article too short ({word_count} words).")
+   return False
+  article.clear()
+  article.update(revised)
+ return False
 
 def build_html(a, sources):
  title=html.escape(a["title_ar"])
